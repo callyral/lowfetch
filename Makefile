@@ -1,5 +1,5 @@
 CC = clang
-CFLAGS = -std=c89 -fuse-ld=mold -Wall 
+CFLAGS = -std=c89 -fuse-ld=mold -Wall -O3
 all: build run
 
 build: lowfetch.c
