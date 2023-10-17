@@ -6,6 +6,7 @@
 #define ASCII_FILE_SIZE 4096
 #define DEFAULT_SIZE 256
 
+/* from https://www.asciiart.eu/animals/cats */
 static char *ascii_default = " |\\'/-..--.\n"
                              " / _ _   ,  ;\n"
                              "`~=`Y'~_<._./\n"
@@ -28,8 +29,17 @@ int main(int argc, char *argv[])
     enum ColorMode color_mode = MODE_COLOR;
     enum FileMode file_mode = MODE_FILE_NONE;
     
-    /* TODO: add support for XDG_CONFIG_HOME */
-    char *ascii_filename = strcat(getenv("HOME"), "/.config/lowfetch/ascii");
+    char *ascii_filename;
+    /* use XDG_CONFIG_HOME if it exists, otherwise default to ~/.config/ */
+    if (getenv("XDG_CONFIG_HOME"))
+    {
+        ascii_filename = strcat(getenv("XDG_CONFIG_HOME"), "/lowfetch/ascii"); 
+    }
+    else
+    {
+        ascii_filename = strcat(getenv("HOME"), "/.config/lowfetch/ascii"); 
+    }
+
     if (argc > 1)
     {
         int i;
