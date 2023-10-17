@@ -1,14 +1,12 @@
-name := lowfetch
-CXX = clang
-CSTD = c89
-LD = mold
+CC = clang
+CFLAGS = -std=c89 -fuse-ld=mold -Wall 
 all: build run
 
-build: $(name).c
-	$(CXX) $(name).c -o $(name) -std=$(CSTD) -fuse-ld=$(LD) -Wall
+build: lowfetch.c
+	$(CC) lowfetch.c -o lowfetch $(CFLAGS)
 
-run: $(name)
-	./$(name)
+run: lowfetch
+	./lowfetch
 
-clean: $(name)
-	rm $(name)
+clean:
+	rm -f lowfetch
