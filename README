@@ -1,0 +1,24 @@
+lowfetch
+--------
+A system info tool I made to learn C
+
+GOALS:
+* Use C89[1]
+* Few lines of code (<500) while having readable code
+* Few/no runtime dependencies
+
+TODO:
+* Add distro name
+* Add more color options
+* ...
+
+(default) COMPILATION REQUIREMENTS:
+* GNU Make
+* A C compiler (CXX=clang by default)
+* Mold linker (LD=mold)
+command: make build
+
+NOTES:
+*[1] c99 or later may be used in the future, but only if necessary
+* There is no planned support for non-Linux operating systems
+
