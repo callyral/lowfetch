@@ -1,10 +1,9 @@
 #include "lowfetch.h"
 #include "colors.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #define ASCII_FILE_SIZE 4096
 #define DEFAULT_SIZE 256
+/* color used when --color is used without an argument */
+#define DEFAULT_COLOR ANSI_COLOR_BLUE
 
 /* from https://www.asciiart.eu/animals/cats */
 static char *ascii_default = " |\\'/-..--.\n"
@@ -14,13 +13,13 @@ static char *ascii_default = " |\\'/-..--.\n"
 
 enum ColorChars
 {
-  WHITE = 'w',
-  RED = 'r',
-  GREEN = 'g',
-  YELLOW = 'y',
-  BLUE = 'b',
-  MAGENTA = 'm',
-  CYAN = 'c'
+  CHAR_WHITE = 'w',
+  CHAR_RED = 'r',
+  CHAR_GREEN = 'g',
+  CHAR_YELLOW = 'y',
+  CHAR_BLUE = 'b',
+  CHAR_MAGENTA = 'm',
+  CHAR_CYAN = 'c'
 };
 
 enum FileMode
@@ -39,8 +38,9 @@ struct SystemInfo
 
 int main(int argc, char **argv)
 {
-    enum ColorChars accent_color = WHITE;
+    enum ColorChars accent_color = CHAR_WHITE;
     enum FileMode file_mode = MODE_FILE_NONE;
+    bool accent_bold = false;
     
     char *ascii_filename;
     /* use XDG_CONFIG_HOME if it exists, otherwise default to ~/.config/ */
@@ -53,12 +53,12 @@ int main(int argc, char **argv)
         ascii_filename = strcat(getenv("HOME"), "/.config/lowfetch/ascii"); 
     }
     
+    /* CLI argument parsing (could be better though) */
     if (argc > 1)
     {
         int i;
         for (i = 1; i < argc; ++i)
         {
-            /* pretty terrible argument parsing, fix eventually */
             if (strcmp(argv[i], "--file") == 0)
             {
                 file_mode = MODE_FILE;
@@ -71,12 +71,17 @@ int main(int argc, char **argv)
             }
             if (strcmp(argv[i], "--color") == 0)
             {
-                accent_color = BLUE;
+                accent_color = CHAR_BLUE;
                 if (argv[i+1] && argv[i+1][0] != '-')
                 {
                     accent_color = argv[i+1][0];
                 }
 
+                continue;
+            }
+            if (strcmp(argv[i], "--bold") == 0)
+            {
+                accent_bold = true;
                 continue;
             }
         }
@@ -89,7 +94,7 @@ int main(int argc, char **argv)
 
     struct SystemInfo system_info = {ascii, distro_id, uptime, kernel_version};
 
-    info_print(accent_color, system_info);
+    info_print(accent_color, accent_bold, system_info);
     
     free(ascii);
     //free(distro_id);
@@ -123,6 +128,50 @@ char *file_read(const char *filename, size_t size)
     fclose(file); // close the file since it's already been stored
 
     return output;
+}
+
+char *get_ansi_color_from(enum ColorChars color, bool bold)
+{
+    if (!bold)
+    {
+        switch (color)
+        {
+            case CHAR_WHITE:
+                return ANSI_COLOR_RESET;
+            case CHAR_RED:
+                return ANSI_COLOR_RED;
+            case CHAR_GREEN:
+                return ANSI_COLOR_GREEN;
+            case CHAR_YELLOW:
+                return ANSI_COLOR_YELLOW;
+            case CHAR_MAGENTA:
+                return ANSI_COLOR_MAGENTA;
+            case CHAR_CYAN:
+                return ANSI_COLOR_CYAN;
+            default:
+                return DEFAULT_COLOR;
+        }
+    }
+    else
+    {
+        switch (color)
+        {
+            case CHAR_WHITE:
+                return ANSI_COLOR_RESET_BOLD;
+            case CHAR_RED:
+                return ANSI_COLOR_RED_BOLD;
+            case CHAR_GREEN:
+                return ANSI_COLOR_GREEN_BOLD;
+            case CHAR_YELLOW:
+                return ANSI_COLOR_YELLOW_BOLD;
+            case CHAR_MAGENTA:
+                return ANSI_COLOR_MAGENTA_BOLD;
+            case CHAR_CYAN:
+                return ANSI_COLOR_CYAN_BOLD;
+            default:
+                return ANSI_COLOR_BLUE_BOLD;
+        }
+    }
 }
 
 char *get_ascii(enum FileMode file_mode, const char *filename, size_t size)
@@ -171,34 +220,17 @@ char *get_kernel_version(size_t size)
     return kernel_version;
 }
 
-char *get_ansi_color_from(enum ColorChars color)
-{
-    switch (color)
-    {
-        case WHITE:
-            return ANSI_COLOR_RESET;
-        case RED:
-            return ANSI_COLOR_RED;
-        case GREEN:
-            return ANSI_COLOR_GREEN;
-        case YELLOW:
-            return ANSI_COLOR_YELLOW;
-        case MAGENTA:
-            return ANSI_COLOR_MAGENTA;
-        case CYAN:
-            return ANSI_COLOR_CYAN;
-        default:
-            return ANSI_COLOR_BLUE;
-    }
-}
 
-int info_print(enum ColorChars accent_color, struct SystemInfo system_info)
+
+#define GET_COLOR() get_ansi_color_from(accent_color, accent_bold)
+int info_print(enum ColorChars accent_color, bool accent_bold, struct SystemInfo system_info)
 {
     /* TODO: add bold options */
-    printf("%s%s%s\n", get_ansi_color_from(accent_color), system_info.ascii, ANSI_COLOR_RESET);
-    printf("%sdistro:%s %s\n", get_ansi_color_from(accent_color), ANSI_COLOR_RESET, system_info.distro_id);
-    printf("%suptime:%s %s\n", get_ansi_color_from(accent_color), ANSI_COLOR_RESET, system_info.uptime);
-    printf("%skernel:%s %s\n", get_ansi_color_from(accent_color), ANSI_COLOR_RESET, system_info.kernel_version);
+    printf("%s%s%s\n", GET_COLOR(), system_info.ascii, ANSI_COLOR_RESET);
+    printf("%sdistro:%s %s\n", GET_COLOR(), ANSI_COLOR_RESET, system_info.distro_id);
+    printf("%suptime:%s %s\n", GET_COLOR(), ANSI_COLOR_RESET, system_info.uptime);
+    printf("%skernel:%s %s\n", GET_COLOR(), ANSI_COLOR_RESET, system_info.kernel_version);
 
     return 0;
 }
+#undef GET_ANSI
