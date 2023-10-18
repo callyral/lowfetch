@@ -4,6 +4,7 @@
 #define DEFAULT_SIZE 256
 /* color used when --color is used without an argument */
 #define DEFAULT_COLOR ANSI_COLOR_BLUE
+#define DEFAULT_COLOR_BOLD ANSI_COLOR_BLUE_BOLD
 
 /* from https://www.asciiart.eu/animals/cats */
 static char *ascii_default = " |\\'/-..--.\n"
@@ -169,7 +170,7 @@ char *get_ansi_color_from(enum ColorChars color, bool bold)
             case CHAR_CYAN:
                 return ANSI_COLOR_CYAN_BOLD;
             default:
-                return ANSI_COLOR_BLUE_BOLD;
+                return DEFAULT_COLOR_BOLD;
         }
     }
 }
