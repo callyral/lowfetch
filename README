@@ -14,7 +14,7 @@ TODO:
 (default) COMPILATION REQUIREMENTS:
 * GNU Make
 * A C compiler (CC=clang by default)
-* Mold linker (CFLAGS=-std=c89 -fuse-ld=mold -Wall)
+* Mold linker (CFLAGS=-std=c99 -fuse-ld=mold -Wall)
 command: make build
 
 NOTES:

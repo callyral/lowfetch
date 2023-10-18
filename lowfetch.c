@@ -24,9 +24,17 @@ enum FileMode
     MODE_FILE
 };
 
-int main(int argc, char *argv[])
+struct SystemInfo
 {
-    enum ColorMode color_mode = MODE_COLOR;
+    char *ascii;
+    char *distro_id;
+    char *uptime;
+    char *kernel_version;
+};
+
+int main(int argc, char **argv)
+{
+    enum ColorMode color_mode = MODE_COLOR_NONE;
     enum FileMode file_mode = MODE_FILE_NONE;
     
     char *ascii_filename;
@@ -45,7 +53,7 @@ int main(int argc, char *argv[])
         int i;
         for (i = 1; i < argc; ++i)
         {
-            /* check if one of the arguments is "--file" */
+            /* pretty terrible argument parsing, fix eventually */
             if (strcmp(argv[i], "--file") == 0)
             {
                 file_mode = MODE_FILE;
@@ -54,6 +62,12 @@ int main(int argc, char *argv[])
                 {
                     ascii_filename = argv[i+1];
                 }
+                continue;
+            }
+            if (strcmp(argv[i], "--color") == 0)
+            {
+                color_mode = MODE_COLOR;
+                continue;
             }
         }
     }
@@ -62,25 +76,13 @@ int main(int argc, char *argv[])
     char *distro_id = get_distro_id(DEFAULT_SIZE);
     char *uptime = get_uptime(DEFAULT_SIZE);
     char *kernel_version = get_kernel_version(DEFAULT_SIZE);
-    
-    /* clean this up later */
-    switch (color_mode)
-    {
-        case MODE_COLOR_NONE:
-            printf("%s\n", ascii);
-            printf("distro: %s\n", distro_id);
-            printf("uptime: %s\n", uptime);
-            printf("kernel: %s\n", kernel_version);
-        case MODE_COLOR:
-            /* TODO: add more colors and bold */
-            printf("%s%s%s\n", ANSI_COLOR_BLUE, ascii, ANSI_COLOR_RESET);
-            printf("distro: %s\n", distro_id);
-            printf("uptime: %s\n", uptime);
-            printf("kernel: %s\n", kernel_version);
-    }
+
+    struct SystemInfo system_info = {ascii, distro_id, uptime, kernel_version};
+
+    info_print(color_mode, system_info);
     
     free(ascii);
-    /*free(distro_id);*/
+    //free(distro_id);
     free(uptime);
     free(kernel_version);
     return 0;
@@ -98,7 +100,7 @@ char *file_read(const char *filename, size_t size)
     char *output;
     output = malloc((size+1)*sizeof(*output)); 
 
-    fread(output, size, 1, file); /* store the variable into output */
+    fread(output, size, 1, file); // store the file into output
     if (!output) 
     {
         fprintf(stderr, "error: unable to read '%s'\n", filename);
@@ -106,9 +108,9 @@ char *file_read(const char *filename, size_t size)
     }
     else
     {
-        output[strlen(output) - 1] = 0; /* trim the trailing newline */
+        output[strlen(output) - 1] = 0; // trim the trailing newline
     }
-    fclose(file); /* close the file since it's already been stored */
+    fclose(file); // close the file since it's already been stored
 
     return output;
 }
@@ -120,7 +122,7 @@ char *get_ascii(enum FileMode file_mode, const char *filename, size_t size)
     {
         case MODE_FILE_NONE:
             ascii = malloc((size+1) * sizeof(*ascii));
-            strcpy(ascii, ascii_default);
+            strcpy(ascii, ascii_default); // copy ascii_default into ascii
             return ascii;
         case MODE_FILE:
             ascii = file_read(filename, size);
@@ -141,7 +143,7 @@ char *get_ascii(enum FileMode file_mode, const char *filename, size_t size)
 char *get_distro_id(size_t size)
 {
     /* TODO: parser for /etc/os-release */
-    /*char *filename = "/etc/os-release";*/
+    //char *filename = "/etc/os-release";
     return "work in progress!!!";
 }
 
@@ -159,4 +161,20 @@ char *get_kernel_version(size_t size)
     return kernel_version;
 }
 
+int info_print(enum ColorMode color_mode, struct SystemInfo system_info)
+{
+    switch (color_mode)
+    {
+        case MODE_COLOR_NONE:
+            printf("%s\n", system_info.ascii);
+            break;
+        case MODE_COLOR:
+            /* TODO: add more colors and bold */
+            printf("%s%s%s\n", ANSI_COLOR_BLUE, system_info.ascii, ANSI_COLOR_RESET);
+    }
+    printf("distro: %s\n", system_info.distro_id);
+    printf("uptime: %s\n", system_info.uptime);
+    printf("kernel: %s\n", system_info.kernel_version);
 
+    return 0;
+}
