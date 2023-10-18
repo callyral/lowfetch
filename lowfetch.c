@@ -226,11 +226,11 @@ char *get_kernel_version(size_t size)
 #define GET_COLOR() get_ansi_color_from(accent_color, accent_bold)
 int info_print(enum ColorChars accent_color, bool accent_bold, struct SystemInfo system_info)
 {
-    /* TODO: add bold options */
-    printf("%s%s%s\n", GET_COLOR(), system_info.ascii, ANSI_COLOR_RESET);
-    printf("%sdistro:%s %s\n", GET_COLOR(), ANSI_COLOR_RESET, system_info.distro_id);
-    printf("%suptime:%s %s\n", GET_COLOR(), ANSI_COLOR_RESET, system_info.uptime);
-    printf("%skernel:%s %s\n", GET_COLOR(), ANSI_COLOR_RESET, system_info.kernel_version);
+    char *ansi_accent_color = GET_COLOR();
+    printf("%s%s%s\n", ansi_accent_color, system_info.ascii, ANSI_COLOR_RESET);
+    printf("%sdistro:%s %s\n", ansi_accent_color, ANSI_COLOR_RESET, system_info.distro_id);
+    printf("%suptime:%s %s\n", ansi_accent_color, ANSI_COLOR_RESET, system_info.uptime);
+    printf("%skernel:%s %s\n", ansi_accent_color, ANSI_COLOR_RESET, system_info.kernel_version);
 
     return 0;
 }

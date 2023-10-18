@@ -9,6 +9,7 @@ GOALS:
 TODO:
 * Add distro name
 * Add a --help menu
+* Add config for changing output order
 * Better argument parsing
 * ...
 
