@@ -12,10 +12,15 @@ static char *ascii_default = " |\\'/-..--.\n"
                              "`~=`Y'~_<._./\n"
                              " <`-....__.'";
 
-enum ColorMode
+enum ColorChars
 {
-    MODE_COLOR_NONE,
-    MODE_COLOR
+  WHITE = 'w',
+  RED = 'r',
+  GREEN = 'g',
+  YELLOW = 'y',
+  BLUE = 'b',
+  MAGENTA = 'm',
+  CYAN = 'c'
 };
 
 enum FileMode
@@ -34,7 +39,7 @@ struct SystemInfo
 
 int main(int argc, char **argv)
 {
-    enum ColorMode color_mode = MODE_COLOR_NONE;
+    enum ColorChars accent_color = WHITE;
     enum FileMode file_mode = MODE_FILE_NONE;
     
     char *ascii_filename;
@@ -47,7 +52,7 @@ int main(int argc, char **argv)
     {
         ascii_filename = strcat(getenv("HOME"), "/.config/lowfetch/ascii"); 
     }
-
+    
     if (argc > 1)
     {
         int i;
@@ -57,8 +62,8 @@ int main(int argc, char **argv)
             if (strcmp(argv[i], "--file") == 0)
             {
                 file_mode = MODE_FILE;
-                /* set ascii_filename to what is after "--file" */
-                if (argv[i+1])
+                /* set ascii_filename to what is after "--file", unless it starts with '-' */
+                if (argv[i+1] && argv[i+1][0] != '-')
                 {
                     ascii_filename = argv[i+1];
                 }
@@ -66,7 +71,12 @@ int main(int argc, char **argv)
             }
             if (strcmp(argv[i], "--color") == 0)
             {
-                color_mode = MODE_COLOR;
+                accent_color = BLUE;
+                if (argv[i+1] && argv[i+1][0] != '-')
+                {
+                    accent_color = argv[i+1][0];
+                }
+
                 continue;
             }
         }
@@ -79,7 +89,7 @@ int main(int argc, char **argv)
 
     struct SystemInfo system_info = {ascii, distro_id, uptime, kernel_version};
 
-    info_print(color_mode, system_info);
+    info_print(accent_color, system_info);
     
     free(ascii);
     //free(distro_id);
@@ -161,20 +171,34 @@ char *get_kernel_version(size_t size)
     return kernel_version;
 }
 
-int info_print(enum ColorMode color_mode, struct SystemInfo system_info)
+char *get_ansi_color_from(enum ColorChars color)
 {
-    switch (color_mode)
+    switch (color)
     {
-        case MODE_COLOR_NONE:
-            printf("%s\n", system_info.ascii);
-            break;
-        case MODE_COLOR:
-            /* TODO: add more colors and bold */
-            printf("%s%s%s\n", ANSI_COLOR_BLUE, system_info.ascii, ANSI_COLOR_RESET);
+        case WHITE:
+            return ANSI_COLOR_RESET;
+        case RED:
+            return ANSI_COLOR_RED;
+        case GREEN:
+            return ANSI_COLOR_GREEN;
+        case YELLOW:
+            return ANSI_COLOR_YELLOW;
+        case MAGENTA:
+            return ANSI_COLOR_MAGENTA;
+        case CYAN:
+            return ANSI_COLOR_CYAN;
+        default:
+            return ANSI_COLOR_BLUE;
     }
-    printf("distro: %s\n", system_info.distro_id);
-    printf("uptime: %s\n", system_info.uptime);
-    printf("kernel: %s\n", system_info.kernel_version);
+}
+
+int info_print(enum ColorChars accent_color, struct SystemInfo system_info)
+{
+    /* TODO: add bold options */
+    printf("%s%s%s\n", get_ansi_color_from(accent_color), system_info.ascii, ANSI_COLOR_RESET);
+    printf("%sdistro:%s %s\n", get_ansi_color_from(accent_color), ANSI_COLOR_RESET, system_info.distro_id);
+    printf("%suptime:%s %s\n", get_ansi_color_from(accent_color), ANSI_COLOR_RESET, system_info.uptime);
+    printf("%skernel:%s %s\n", get_ansi_color_from(accent_color), ANSI_COLOR_RESET, system_info.kernel_version);
 
     return 0;
 }

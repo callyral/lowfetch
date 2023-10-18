@@ -8,7 +8,8 @@ GOALS:
 
 TODO:
 * Add distro name
-* Add more color options
+* Add a --help menu
+* Better argument parsing
 * ...
 
 (default) COMPILATION REQUIREMENTS:
