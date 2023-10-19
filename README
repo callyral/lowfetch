@@ -6,10 +6,12 @@ GOALS:
 * Few lines of code (<500) while having readable code
 * Few/no runtime dependencies
 
-TODO:
-* Add distro name
-* Add a --help menu
+IN PROGRESS:
 * Add config for changing output order
+* Add distro name
+
+TODO:
+* Add a --help menu
 * Better argument parsing
 * ...
 

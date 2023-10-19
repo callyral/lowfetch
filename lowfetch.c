@@ -14,13 +14,13 @@ static char *ascii_default = " |\\'/-..--.\n"
 
 enum ColorChars
 {
-  CHAR_WHITE = 'w',
-  CHAR_RED = 'r',
-  CHAR_GREEN = 'g',
-  CHAR_YELLOW = 'y',
-  CHAR_BLUE = 'b',
-  CHAR_MAGENTA = 'm',
-  CHAR_CYAN = 'c'
+    CHAR_WHITE = 'w',
+    CHAR_RED = 'r',
+    CHAR_GREEN = 'g',
+    CHAR_YELLOW = 'y',
+    CHAR_BLUE = 'b',
+    CHAR_MAGENTA = 'm',
+    CHAR_CYAN = 'c'
 };
 
 enum FileMode
@@ -29,18 +29,26 @@ enum FileMode
     MODE_FILE
 };
 
+enum SystemInfoOrder
+{
+    CHAR_ASCII = 'a',
+    CHAR_DISTRO_ID = 'd',
+    CHAR_KERNEL_VERSION = 'k',
+    CHAR_UPTIME = 'u'
+};
+
 struct SystemInfo
 {
     char *ascii;
     char *distro_id;
-    char *uptime;
     char *kernel_version;
+    char *uptime;
 };
 
 int main(int argc, char **argv)
 {
     enum ColorChars accent_color = CHAR_WHITE;
-    enum FileMode file_mode = MODE_FILE_NONE;
+    enum FileMode ascii_file_mode = MODE_FILE_NONE;
     bool accent_bold = false;
     
     char *ascii_filename;
@@ -57,12 +65,11 @@ int main(int argc, char **argv)
     /* CLI argument parsing (could be better though) */
     if (argc > 1)
     {
-        int i;
-        for (i = 1; i < argc; ++i)
+        for (int i = 1; i < argc; ++i)
         {
-            if (strcmp(argv[i], "--file") == 0)
+            if (strcmp(argv[i], "--ascii") == 0)
             {
-                file_mode = MODE_FILE;
+                ascii_file_mode = MODE_FILE;
                 /* set ascii_filename to what is after "--file", unless it starts with '-' */
                 if (argv[i+1] && argv[i+1][0] != '-')
                 {
@@ -88,12 +95,12 @@ int main(int argc, char **argv)
         }
     }
 
-    char *ascii = get_ascii(file_mode, ascii_filename, ASCII_FILE_SIZE);
+    char *ascii = get_ascii(ascii_file_mode, ascii_filename, ASCII_FILE_SIZE);
     char *distro_id = get_distro_id(DEFAULT_SIZE);
     char *uptime = get_uptime(DEFAULT_SIZE);
     char *kernel_version = get_kernel_version(DEFAULT_SIZE);
 
-    struct SystemInfo system_info = {ascii, distro_id, uptime, kernel_version};
+    struct SystemInfo system_info = {.ascii = ascii, .distro_id = distro_id, .kernel_version = kernel_version, .uptime = uptime};
 
     info_print(accent_color, accent_bold, system_info);
     
@@ -221,16 +228,21 @@ char *get_kernel_version(size_t size)
     return kernel_version;
 }
 
-
-
 #define GET_COLOR() get_ansi_color_from(accent_color, accent_bold)
 int info_print(enum ColorChars accent_color, bool accent_bold, struct SystemInfo system_info)
 {
     char *ansi_accent_color = GET_COLOR();
-    printf("%s%s%s\n", ansi_accent_color, system_info.ascii, ANSI_COLOR_RESET);
-    printf("%sdistro:%s %s\n", ansi_accent_color, ANSI_COLOR_RESET, system_info.distro_id);
-    printf("%suptime:%s %s\n", ansi_accent_color, ANSI_COLOR_RESET, system_info.uptime);
-    printf("%skernel:%s %s\n", ansi_accent_color, ANSI_COLOR_RESET, system_info.kernel_version);
+    char order[] = {CHAR_ASCII, CHAR_DISTRO_ID, CHAR_KERNEL_VERSION, CHAR_UPTIME};
+
+    for (int i = 0; i <= sizeof(order); ++i)
+    {
+        switch (order[i]) {
+            case CHAR_ASCII: printf("%s%s%s\n", ansi_accent_color, system_info.ascii, ANSI_COLOR_RESET); break;
+            case CHAR_DISTRO_ID: printf("%sdistro:%s %s\n", ansi_accent_color, ANSI_COLOR_RESET, system_info.distro_id); break;
+            case CHAR_UPTIME: printf("%suptime:%s %s\n", ansi_accent_color, ANSI_COLOR_RESET, system_info.uptime); break;
+            case CHAR_KERNEL_VERSION: printf("%skernel:%s %s\n", ansi_accent_color, ANSI_COLOR_RESET, system_info.kernel_version);
+        }
+    }
 
     return 0;
 }
