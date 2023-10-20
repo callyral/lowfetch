@@ -27,6 +27,6 @@ char *get_distro_id(size_t size);
 char *get_uptime(size_t size);
 char *get_kernel_version(size_t size);
 
-int info_print(enum ColorChars accent_color, bool accent_bold, struct SystemInfo system_info);
+int info_print(enum ColorChars accent_color_char, bool accent_bold, struct SystemInfo system_info);
 
 #endif
