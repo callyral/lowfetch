@@ -223,4 +223,4 @@ int info_print(enum ColorChars accent_color, bool accent_bold, struct SystemInfo
 
     return 0;
 }
-#undef GET_ANSI
+#undef GET_COLOR
