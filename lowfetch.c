@@ -47,9 +47,13 @@ int main(int argc, char **argv)
     
     /* CLI argument parsing */
     /* format: { short, long, desc }*/
+    const char *argdef_help[] = {"-h", "--help", "show this help menu"};
     const char *argdef_ascii_file[] = {"-a", "--ascii", "select ascii file"};
     const char *argdef_color[] = {"-c", "--color", "select color"};
     const char *argdef_bold[] = {"-b", "--bold", "toggle bold colors"};
+    // arguments to include in help menu
+    #define ARGDEFS_LIST_SIZE 4
+    const char **argdefs_list[] = {argdef_help, argdef_ascii_file, argdef_color, argdef_bold};
     if (argc > 1)
     {
         for (int i = 1; i < argc; ++i)
@@ -77,6 +81,11 @@ int main(int argc, char **argv)
                 accent_bold = true;
                 continue;
             }
+            if (arg_parse(argdef_help, argv[i]))
+            {
+                help_menu_print(argdefs_list);
+                return 0;
+            }
         }
     }
 
@@ -100,6 +109,16 @@ bool arg_parse(const char *argdef[], const char *string)
 {
     return strcmp(string, argdef[0]) == 0 || strcmp(string, argdef[1]) == 0;
 }
+
+void help_menu_print(const char **argdefs_list[])
+{
+    printf("usage: lowfetch [options]\n");
+    for(int i = 0; i < ARGDEFS_LIST_SIZE; ++i)
+    {
+        printf("%s, %s,\t%s\n", argdefs_list[i][0], argdefs_list[i][1], argdefs_list[i][2]);
+    }
+}
+#undef ARGDEFS_LIST_SIZE
 
 char *file_read(const char *filename, size_t size)
 {
