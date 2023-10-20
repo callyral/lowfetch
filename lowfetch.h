@@ -18,6 +18,7 @@ enum ColorChars
 
 struct SystemInfo;
 
+bool arg_parse(const char *argdef[], const char *string);
 char *file_read(const char *filename, size_t size); /* read from a file, requires freeing the assigned variable later */
 
 char *get_ansi_color_from(enum ColorChars color, bool bold);

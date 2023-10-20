@@ -45,22 +45,25 @@ int main(int argc, char **argv)
         ascii_filename = strcat(getenv("HOME"), "/.config/lowfetch/ascii"); 
     }
     
-    /* CLI argument parsing (could be better though) */
+    /* CLI argument parsing */
+    /* format: { short, long, desc }*/
+    const char *argdef_ascii_file[] = {"-a", "--ascii", "select ascii file"};
+    const char *argdef_color[] = {"-c", "--color", "select color"};
+    const char *argdef_bold[] = {"-b", "--bold", "toggle bold colors"};
     if (argc > 1)
     {
         for (int i = 1; i < argc; ++i)
         {
-            if (strcmp(argv[i], "--ascii") == 0)
+            if (arg_parse(argdef_ascii_file, argv[i]))
             {
                 use_ascii_file = true;
-                /* set ascii_filename to what is after "--file", unless it starts with '-' */
                 if (argv[i+1] && argv[i+1][0] != '-')
                 {
                     ascii_filename = argv[i+1];
                 }
                 continue;
             }
-            if (strcmp(argv[i], "--color") == 0)
+            if (arg_parse(argdef_color, argv[i]))
             {
                 if (argv[i+1] && argv[i+1][0] != '-')
                 {
@@ -69,7 +72,7 @@ int main(int argc, char **argv)
 
                 continue;
             }
-            if (strcmp(argv[i], "--bold") == 0)
+            if (arg_parse(argdef_bold, argv[i]))
             {
                 accent_bold = true;
                 continue;
@@ -91,6 +94,11 @@ int main(int argc, char **argv)
     free(uptime);
     free(kernel_version);
     return 0;
+}
+
+bool arg_parse(const char *argdef[], const char *string)
+{
+    return strcmp(string, argdef[0]) == 0 || strcmp(string, argdef[1]) == 0;
 }
 
 char *file_read(const char *filename, size_t size)
@@ -205,10 +213,9 @@ char *get_kernel_version(size_t size)
     return kernel_version;
 }
 
-#define GET_COLOR() get_ansi_color_from(accent_color, accent_bold)
-int info_print(enum ColorChars accent_color, bool accent_bold, struct SystemInfo system_info)
+int info_print(enum ColorChars accent_color_char, bool accent_bold, struct SystemInfo system_info)
 {
-    char *ansi_accent_color = GET_COLOR();
+    char *ansi_accent_color = get_ansi_color_from(accent_color_char, accent_bold);
     char order[] = {CHAR_ASCII, CHAR_DISTRO_ID, CHAR_KERNEL_VERSION, CHAR_UPTIME};
 
     for (int i = 0; i <= sizeof(order); ++i)
@@ -223,4 +230,3 @@ int info_print(enum ColorChars accent_color, bool accent_bold, struct SystemInfo
 
     return 0;
 }
-#undef GET_COLOR

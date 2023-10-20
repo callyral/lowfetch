@@ -12,8 +12,6 @@ IN PROGRESS:
 
 TODO:
 * Add a --help menu
-* Better argument parsing
-* ...
 
 (default) COMPILATION REQUIREMENTS:
 * GNU Make
