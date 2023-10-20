@@ -53,7 +53,7 @@ int main(int argc, char **argv)
     const char *argdef_bold[] = {"-b", "--bold", "toggle bold colors"};
     // arguments to include in help menu
     #define ARGDEFS_LIST_SIZE 4
-    const char **argdefs_list[] = {argdef_help, argdef_ascii_file, argdef_color, argdef_bold};
+    const char **argdefs_list[ARGDEFS_LIST_SIZE] = {argdef_help, argdef_ascii_file, argdef_color, argdef_bold};
     if (argc > 1)
     {
         for (int i = 1; i < argc; ++i)
