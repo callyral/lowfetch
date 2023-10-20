@@ -1,5 +1,5 @@
-#ifndef ASCII_H_
-#define ASCII_H_
+#ifndef LOWFETCH_H_
+#define LOWFETCH_H_
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
