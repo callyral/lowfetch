@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
+#include <unistd.h>
 #include "lowfetch.h"
 #include "include/colors.h"
 #define ASCII_FILE_SIZE 4096
@@ -219,10 +220,20 @@ char *get_ansi_color_from(char color_char, bool bold)
 char *get_ascii(bool use_file, const char *filename, size_t size)
 {
     char *ascii;
-    if (!use_file || !file_read(filename, size))
+
+    if (!use_file)
     {
         ascii = malloc((size+1) * sizeof(*ascii));
         strcpy(ascii, ascii_default); // copy ascii_default into ascii
+        return ascii;
+    }
+
+    if (access(filename, R_OK) == -1)
+    {
+        fprintf(stderr, "error: '%s' is unreadable or doesn't exist\n", filename);
+
+        ascii = malloc((size+1) * sizeof(*ascii));
+        strcpy(ascii, ascii_default);
         return ascii;
     }
     else 
@@ -238,7 +249,7 @@ char *get_distro_id(size_t size)
     FILE *file = fopen("/etc/os-release", "r");
     if (!file)
     {
-        fprintf(stderr, "error: '/etc/os-release' is inaccessible\n");
+        fprintf(stderr, "error: '/etc/os-release' is unreadable or doesn't exist\n");
         return NULL;
     }
 
@@ -303,8 +314,13 @@ int info_print(char accent_color_char, bool accent_bold, bool use_order_file, ch
     char *ansi_accent_color = get_ansi_color_from(accent_color_char, accent_bold);
     char *order;
     order = malloc((order_file_size+1)*sizeof(*order));
-    if (!use_order_file || !file_read(order_filename, order_file_size))
+    if (!use_order_file)
     {
+        sprintf(order, "%c%c%c%c", CHAR_ASCII, CHAR_DISTRO_ID, CHAR_UPTIME, CHAR_KERNEL_VERSION);
+    }
+    else if (access(order_filename, R_OK) == -1)
+    {
+        fprintf(stderr, "error: '%s' is unreadable or doesn't exist\n", order_filename);
         sprintf(order, "%c%c%c%c", CHAR_ASCII, CHAR_DISTRO_ID, CHAR_UPTIME, CHAR_KERNEL_VERSION);
     }
     else
