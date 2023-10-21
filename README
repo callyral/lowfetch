@@ -7,10 +7,11 @@ GOALS:
 * Few/no runtime dependencies
 
 IN PROGRESS:
-* Add distro name
+* Make distro name prettier
 
 TODO:
-* Add option for shortening kernel version
+* Add package amount
+* Add shell information
 
 (default) COMPILATION REQUIREMENTS:
 * GNU Make

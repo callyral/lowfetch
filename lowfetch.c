@@ -51,6 +51,7 @@ int main(int argc, char **argv)
     bool use_ascii_file = false;
     bool use_order_file = false;
     bool accent_bold = false;
+    bool kernel_version_shorten = false;
     
     char ascii_filename[FILENAME_SIZE];
     char order_filename[FILENAME_SIZE];
@@ -77,9 +78,10 @@ int main(int argc, char **argv)
     const char *argdef_order_file[] = {"-o", "--order", "select order file"};
     const char *argdef_color[] = {"-c", "--color", "select color"};
     const char *argdef_bold[] = {"-b", "--bold", "toggle bold colors"};
+    const char *argdef_kvshorten[] = {"-kvs", "--kernel-version-shorten", "shorten kernel version"};
     // arguments to include in help menu
-    #define ARGDEFS_LIST_SIZE 5
-    const char **argdefs_list[ARGDEFS_LIST_SIZE] = {argdef_help, argdef_ascii_file, argdef_order_file, argdef_color, argdef_bold};
+    #define ARGDEFS_LIST_SIZE 6
+    const char **argdefs_list[ARGDEFS_LIST_SIZE] = {argdef_help, argdef_ascii_file, argdef_order_file, argdef_color, argdef_bold, argdef_kvshorten};
     if (argc > 1)
     {
         for (int i = 1; i < argc; ++i)
@@ -115,6 +117,11 @@ int main(int argc, char **argv)
                 accent_bold = true;
                 continue;
             }
+            if (arg_parse(argdef_kvshorten, argv[i]))
+            {
+                kernel_version_shorten = true;
+                continue;
+            }
             if (arg_parse(argdef_help, argv[i]))
             {
                 help_menu_print(argdefs_list);
@@ -126,7 +133,7 @@ int main(int argc, char **argv)
     char *ascii = get_ascii(use_ascii_file, ascii_filename, ASCII_FILESIZE);
     char *distro_id = get_distro_id(DISTRO_ID_SIZE);
     char *uptime = get_uptime(UPTIME_SIZE);
-    char *kernel_version = get_kernel_version(KERNEL_VERSION_SIZE);
+    char *kernel_version = get_kernel_version(kernel_version_shorten, KERNEL_VERSION_SIZE);
 
     struct SystemInfo system_info = {.ascii = ascii, .distro_id = distro_id, .kernel_version = kernel_version, .uptime = uptime};
 
@@ -167,15 +174,8 @@ char *file_read(const char *filename, size_t size)
     output = malloc((size+1)*sizeof(*output)); 
 
     fread(output, size, 1, file); // store the file into output
-    if (!output) 
-    {
-        fprintf(stderr, "error: unable to read '%s'\n", filename);
-        return NULL;
-    }
-    else
-    {
-        output[strlen(output) - 1] = 0; // trim the trailing newline
-    }
+    output[strlen(output) - 1] = 0; // trim the trailing newline
+
     fclose(file); // close the file since it's already been stored
 
     return output;
@@ -314,10 +314,35 @@ char *get_uptime(size_t size)
     return uptime;
 }
 
-char *get_kernel_version(size_t size)
+char *get_kernel_version(bool shorten, size_t size)
 {
-    char *filename = "/proc/version";
-    char *kernel_version = file_read(filename, size);
+    FILE *file = fopen("/proc/version", "r");
+    if (!file)
+    {
+        fprintf(stderr, "error: '/proc/version' (kernel information) is inaccessible\n");
+        return NULL;
+    }
+
+    char *kernel_version;
+    kernel_version = malloc((size+1)*sizeof(*kernel_version));
+    if (!shorten)
+    {
+        fgets(kernel_version, size, file);
+        kernel_version[strlen(kernel_version) - 1] = 0; // trim the traling newline
+    }
+    else
+    {
+        char *temp = malloc((size+1)*sizeof(*temp));
+        for (int i = 0; i < 3; ++i)
+        {
+            fscanf(file, "%s", temp);
+            sprintf(temp, "%s ", temp);
+            strcat(kernel_version, temp);
+        }
+    }
+    
+    fclose(file);
+
     return kernel_version;
 }
 
