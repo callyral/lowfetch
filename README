@@ -11,7 +11,6 @@ IN PROGRESS:
 
 TODO:
 * Add package amount
-* Add shell information
 
 (default) COMPILATION REQUIREMENTS:
 * GNU Make
@@ -26,5 +25,5 @@ DOCUMENTATION:
 ascii file (xdg-config/lowfetch/ascii):
     format: text
 order file (xdg-config/lowfetch/order):
-    format: [a]scii [d]istro [u]ptime [k]ernel
-    example: aduk
+    format: [a]scii [d]istro [k]ernel [s]hell [u]ptime
+    example: aduks
