@@ -1,5 +1,6 @@
 #include "lowfetch.h"
 #include "include/colors.h"
+#include <stdlib.h>
 #include <string.h>
 #define ASCII_FILE_SIZE 4096
 #define DEFAULT_SIZE 256
@@ -30,28 +31,39 @@ int main(int argc, char **argv)
 {
     char accent_color_char = CHAR_WHITE; // white means no color
     bool use_ascii_file = false;
+    bool use_order_file = false;
     bool accent_bold = false;
     
     char *ascii_filename;
+    char *order_filename;
+    char configdir_ascii[DEFAULT_SIZE];
+    char configdir_order[DEFAULT_SIZE];
     /* use XDG_CONFIG_HOME if it exists, otherwise default to ~/.config/ */
     if (getenv("XDG_CONFIG_HOME"))
     {
-        ascii_filename = strcat(getenv("XDG_CONFIG_HOME"), "/lowfetch/ascii"); 
+        strcpy(configdir_ascii, getenv("XDG_CONFIG_HOME"));
+        strcpy(configdir_order, getenv("XDG_CONFIG_HOME"));
+        ascii_filename = strcat(configdir_ascii, "/lowfetch/ascii"); 
+        order_filename = strcat(configdir_order, "/lowfetch/order"); 
     }
     else
     {
-        ascii_filename = strcat(getenv("HOME"), "/.config/lowfetch/ascii"); 
+        strcpy(configdir_ascii, getenv("HOME"));
+        strcpy(configdir_order, getenv("HOME"));
+        ascii_filename = strcat(configdir_ascii, "/.config/lowfetch/ascii"); 
+        order_filename = strcat(configdir_order, "/.config/lowfetch/order"); 
     }
     
     /* CLI argument parsing */
     /* format: { short, long, desc }*/
     const char *argdef_help[] = {"-h", "--help", "show this help menu"};
     const char *argdef_ascii_file[] = {"-a", "--ascii", "select ascii file"};
+    const char *argdef_order_file[] = {"-o", "--order", "select order file"};
     const char *argdef_color[] = {"-c", "--color", "select color"};
     const char *argdef_bold[] = {"-b", "--bold", "toggle bold colors"};
     // arguments to include in help menu
-    #define ARGDEFS_LIST_SIZE 4
-    const char **argdefs_list[ARGDEFS_LIST_SIZE] = {argdef_help, argdef_ascii_file, argdef_color, argdef_bold};
+    #define ARGDEFS_LIST_SIZE 5
+    const char **argdefs_list[ARGDEFS_LIST_SIZE] = {argdef_help, argdef_ascii_file, argdef_order_file, argdef_color, argdef_bold};
     if (argc > 1)
     {
         for (int i = 1; i < argc; ++i)
@@ -62,6 +74,15 @@ int main(int argc, char **argv)
                 if (argv[i+1] && argv[i+1][0] != '-')
                 {
                     ascii_filename = argv[i+1];
+                }
+                continue;
+            }
+            if (arg_parse(argdef_order_file, argv[i]))
+            {
+                use_order_file = true;
+                if (argv[i+1] && argv[i+1][0] != '-')
+                {
+                    order_filename = argv[i+1];
                 }
                 continue;
             }
@@ -94,7 +115,7 @@ int main(int argc, char **argv)
 
     struct SystemInfo system_info = {.ascii = ascii, .distro_id = distro_id, .kernel_version = kernel_version, .uptime = uptime};
 
-    info_print(accent_color_char, accent_bold, system_info);
+    info_print(accent_color_char, accent_bold, use_order_file, order_filename, DEFAULT_SIZE, system_info);
     
     free(ascii);
     free(distro_id);
@@ -275,10 +296,19 @@ char *get_kernel_version(size_t size)
     return kernel_version;
 }
 
-int info_print(char accent_color_char, bool accent_bold, struct SystemInfo system_info)
+int info_print(char accent_color_char, bool accent_bold, bool use_order_file, char *order_filename, size_t order_file_size, struct SystemInfo system_info)
 {
     char *ansi_accent_color = get_ansi_color_from(accent_color_char, accent_bold);
-    char order[] = {CHAR_ASCII, CHAR_DISTRO_ID, CHAR_KERNEL_VERSION, CHAR_UPTIME};
+    char *order;
+    order = malloc((order_file_size+1)*sizeof(*order));
+    if (!use_order_file || !file_read(order_filename, order_file_size))
+    {
+        sprintf(order, "%c%c%c%c", CHAR_ASCII, CHAR_DISTRO_ID, CHAR_UPTIME, CHAR_KERNEL_VERSION);
+    }
+    else
+    {
+        order = file_read(order_filename, order_file_size);
+    }
 
     for (int i = 0; i <= sizeof(order); ++i)
     {

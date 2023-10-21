@@ -7,7 +7,6 @@ GOALS:
 * Few/no runtime dependencies
 
 IN PROGRESS:
-* Add config for changing output order
 * Add distro name
 
 TODO:
@@ -22,3 +21,9 @@ command: make build
 NOTES:
 * There is no planned support for non-Linux operating systems
 
+DOCUMENTATION:
+ascii file (xdg-config/lowfetch/ascii):
+    format: text
+order file (xdg-config/lowfetch/order):
+    format: [a]scii [d]istro [u]ptime [k]ernel
+    example: aduk
