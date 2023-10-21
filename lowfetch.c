@@ -1,5 +1,6 @@
 #include "lowfetch.h"
 #include "colors.h"
+#include <string.h>
 #define ASCII_FILE_SIZE 4096
 #define DEFAULT_SIZE 256
 /* color used when --color is used without an argument */
@@ -99,7 +100,7 @@ int main(int argc, char **argv)
     info_print(accent_color_char, accent_bold, system_info);
     
     free(ascii);
-    //free(distro_id);
+    free(distro_id);
     free(uptime);
     free(kernel_version);
     return 0;
@@ -214,8 +215,21 @@ char *get_ascii(bool file_mode, const char *filename, size_t size)
 char *get_distro_id(size_t size)
 {
     /* TODO: parser for /etc/os-release */
-    //char *filename = "/etc/os-release";
-    return "work in progress!!!";
+    FILE *file = fopen("/etc/os-release", "r");
+    if (!file)
+    {
+        fprintf(stderr, "error: '/etc/os-release' is inaccessible\n");
+        return NULL;
+    }
+
+    char *distro_id;
+    distro_id = malloc((size+1)*sizeof(*distro_id));
+
+    fscanf(file, "%s", distro_id);
+
+    fclose(file);
+    
+    return distro_id;
 }
 
 char *get_uptime(size_t size)

@@ -11,12 +11,12 @@ IN PROGRESS:
 * Add distro name
 
 TODO:
-* (null)
+* Add option for shortening kernel version
 
 (default) COMPILATION REQUIREMENTS:
 * GNU Make
 * A C compiler (CC=clang by default)
-* Mold linker (CFLAGS=-std=c99 -fuse-ld=mold -Wall)
+* Mold linker (CFLAGS=-std=c99 -fuse-ld=mold -Wall -O3)
 command: make build
 
 NOTES:
