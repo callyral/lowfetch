@@ -28,7 +28,7 @@ struct SystemInfo
 
 int main(int argc, char **argv)
 {
-    enum ColorChars accent_color_char = CHAR_WHITE; // white means no color
+    char accent_color_char = CHAR_WHITE; // white means no color
     bool use_ascii_file = false;
     bool accent_bold = false;
     
