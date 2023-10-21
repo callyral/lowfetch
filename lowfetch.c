@@ -145,11 +145,11 @@ char *file_read(const char *filename, size_t size)
     return output;
 }
 
-char *get_ansi_color_from(enum ColorChars color, bool bold)
+char *get_ansi_color_from(char color_char, bool bold)
 {
     if (!bold)
     {
-        switch (color)
+        switch (color_char)
         {
             case CHAR_WHITE:
                 return ANSI_COLOR_RESET;
@@ -171,7 +171,7 @@ char *get_ansi_color_from(enum ColorChars color, bool bold)
     }
     else
     {
-        switch (color)
+        switch (color_char)
         {
             case CHAR_WHITE:
                 return ANSI_COLOR_RESET_BOLD;
@@ -193,10 +193,10 @@ char *get_ansi_color_from(enum ColorChars color, bool bold)
     }
 }
 
-char *get_ascii(bool file_mode, const char *filename, size_t size)
+char *get_ascii(bool use_file, const char *filename, size_t size)
 {
     char *ascii;
-    if (!file_mode || !file_read(filename, size))
+    if (!use_file || !file_read(filename, size))
     {
         ascii = malloc((size+1) * sizeof(*ascii));
         strcpy(ascii, ascii_default); // copy ascii_default into ascii
@@ -275,7 +275,7 @@ char *get_kernel_version(size_t size)
     return kernel_version;
 }
 
-int info_print(enum ColorChars accent_color_char, bool accent_bold, struct SystemInfo system_info)
+int info_print(char accent_color_char, bool accent_bold, struct SystemInfo system_info)
 {
     char *ansi_accent_color = get_ansi_color_from(accent_color_char, accent_bold);
     char order[] = {CHAR_ASCII, CHAR_DISTRO_ID, CHAR_KERNEL_VERSION, CHAR_UPTIME};
