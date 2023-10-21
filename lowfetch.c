@@ -14,6 +14,17 @@ static char *ascii_default = " |\\'/-..--.\n"
                              "`~=`Y'~_<._./\n"
                              " <`-....__.'";
 
+enum ColorChars
+{
+    CHAR_WHITE = 'w',
+    CHAR_RED = 'r',
+    CHAR_GREEN = 'g',
+    CHAR_YELLOW = 'y',
+    CHAR_BLUE = 'b',
+    CHAR_MAGENTA = 'm',
+    CHAR_CYAN = 'c'
+};
+
 enum SystemChars
 {
     CHAR_ASCII = 'a',
@@ -43,9 +54,9 @@ int main(int argc, char **argv)
     if (getenv("XDG_CONFIG_HOME"))
     {
         strcpy(ascii_filename, getenv("XDG_CONFIG_HOME"));
-        strcat(ascii_filename, "/.config/lowfetch/ascii"); 
+        strcat(ascii_filename, "/lowfetch/ascii"); 
         strcpy(order_filename, getenv("XDG_CONFIG_HOME"));
-        strcat(order_filename, "/.config/lowfetch/order"); 
+        strcat(order_filename, "/lowfetch/order"); 
     }
     else
     {

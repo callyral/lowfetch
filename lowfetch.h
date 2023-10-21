@@ -5,17 +5,6 @@
 #include <string.h>
 #include <stdbool.h>
 
-enum ColorChars
-{
-    CHAR_WHITE = 'w',
-    CHAR_RED = 'r',
-    CHAR_GREEN = 'g',
-    CHAR_YELLOW = 'y',
-    CHAR_BLUE = 'b',
-    CHAR_MAGENTA = 'm',
-    CHAR_CYAN = 'c'
-};
-
 struct SystemInfo;
 
 bool arg_parse(const char *argdef[], const char *string);
