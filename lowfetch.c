@@ -3,9 +3,6 @@
 #include <string.h>
 #define ASCII_FILE_SIZE 4096
 #define DEFAULT_SIZE 256
-/* color used when --color is used without an argument */
-#define DEFAULT_COLOR ANSI_COLOR_BLUE
-#define DEFAULT_COLOR_BOLD ANSI_COLOR_BLUE_BOLD
 
 /* from https://www.asciiart.eu/animals/cats */
 static char *ascii_default = " |\\'/-..--.\n"
@@ -169,7 +166,7 @@ char *get_ansi_color_from(enum ColorChars color, bool bold)
             case CHAR_CYAN:
                 return ANSI_COLOR_CYAN;
             default:
-                return DEFAULT_COLOR;
+                return ANSI_COLOR_RESET;
         }
     }
     else
@@ -191,7 +188,7 @@ char *get_ansi_color_from(enum ColorChars color, bool bold)
             case CHAR_CYAN:
                 return ANSI_COLOR_CYAN_BOLD;
             default:
-                return DEFAULT_COLOR_BOLD;
+                return ANSI_COLOR_RESET_BOLD;
         }
     }
 }
