@@ -1,5 +1,5 @@
 #include "lowfetch.h"
-#include "colors.h"
+#include "include/colors.h"
 #include <string.h>
 #define ASCII_FILE_SIZE 4096
 #define DEFAULT_SIZE 256
