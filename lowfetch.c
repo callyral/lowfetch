@@ -93,7 +93,6 @@ int main(int argc, char **argv)
                 {
                     accent_color_char = argv[i+1][0];
                 }
-
                 continue;
             }
             if (arg_parse(argdef_bold, argv[i]))
