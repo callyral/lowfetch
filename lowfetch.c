@@ -5,8 +5,12 @@
 #include <unistd.h>
 #include "lowfetch.h"
 #include "include/colors.h"
-#define ASCII_FILE_SIZE 4096
-#define DEFAULT_SIZE 256
+#define ASCII_FILESIZE 4096
+#define KERNEL_VERSION_SIZE 512
+#define FILENAME_SIZE 256
+#define DISTRO_ID_SIZE 256
+#define UPTIME_SIZE 256
+#define ORDER_FILESIZE 128
 
 /* from https://www.asciiart.eu/animals/cats */
 static char *ascii_default = " |\\'/-..--.\n"
@@ -48,8 +52,8 @@ int main(int argc, char **argv)
     bool use_order_file = false;
     bool accent_bold = false;
     
-    char ascii_filename[DEFAULT_SIZE];
-    char order_filename[DEFAULT_SIZE];
+    char ascii_filename[FILENAME_SIZE];
+    char order_filename[FILENAME_SIZE];
     /* use XDG_CONFIG_HOME if it exists, otherwise default to ~/.config/ */
     if (getenv("XDG_CONFIG_HOME"))
     {
@@ -119,14 +123,14 @@ int main(int argc, char **argv)
         }
     }
 
-    char *ascii = get_ascii(use_ascii_file, ascii_filename, ASCII_FILE_SIZE);
-    char *distro_id = get_distro_id(DEFAULT_SIZE);
-    char *uptime = get_uptime(DEFAULT_SIZE);
-    char *kernel_version = get_kernel_version(DEFAULT_SIZE);
+    char *ascii = get_ascii(use_ascii_file, ascii_filename, ASCII_FILESIZE);
+    char *distro_id = get_distro_id(DISTRO_ID_SIZE);
+    char *uptime = get_uptime(UPTIME_SIZE);
+    char *kernel_version = get_kernel_version(KERNEL_VERSION_SIZE);
 
     struct SystemInfo system_info = {.ascii = ascii, .distro_id = distro_id, .kernel_version = kernel_version, .uptime = uptime};
 
-    info_print(accent_color_char, accent_bold, use_order_file, order_filename, DEFAULT_SIZE, system_info);
+    info_print(accent_color_char, accent_bold, use_order_file, order_filename, ORDER_FILESIZE, system_info);
     
     free(ascii);
     free(distro_id);
@@ -317,11 +321,11 @@ char *get_kernel_version(size_t size)
     return kernel_version;
 }
 
-int info_print(char accent_color_char, bool accent_bold, bool use_order_file, char *order_filename, size_t order_file_size, struct SystemInfo system_info)
+int info_print(char accent_color_char, bool accent_bold, bool use_order_file, char *order_filename, size_t order_filesize, struct SystemInfo system_info)
 {
     char *ansi_accent_color = get_ansi_color_from(accent_color_char, accent_bold);
     char *order;
-    order = malloc((order_file_size+1)*sizeof(*order));
+    order = malloc((order_filesize+1)*sizeof(*order));
     if (!use_order_file)
     {
         sprintf(order, "%c%c%c%c", CHAR_ASCII, CHAR_DISTRO_ID, CHAR_UPTIME, CHAR_KERNEL_VERSION);
@@ -333,7 +337,7 @@ int info_print(char accent_color_char, bool accent_bold, bool use_order_file, ch
     }
     else
     {
-        order = file_read(order_filename, order_file_size);
+        order = file_read(order_filename, order_filesize);
     }
 
     for (int i = 0; i <= sizeof(order); ++i)
