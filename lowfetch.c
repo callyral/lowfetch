@@ -37,24 +37,22 @@ int main(int argc, char **argv)
     bool use_order_file = false;
     bool accent_bold = false;
     
-    char *ascii_filename;
-    char *order_filename;
-    char configdir_ascii[DEFAULT_SIZE];
-    char configdir_order[DEFAULT_SIZE];
+    char ascii_filename[DEFAULT_SIZE];
+    char order_filename[DEFAULT_SIZE];
     /* use XDG_CONFIG_HOME if it exists, otherwise default to ~/.config/ */
     if (getenv("XDG_CONFIG_HOME"))
     {
-        strcpy(configdir_ascii, getenv("XDG_CONFIG_HOME"));
-        strcpy(configdir_order, getenv("XDG_CONFIG_HOME"));
-        ascii_filename = strcat(configdir_ascii, "/lowfetch/ascii"); 
-        order_filename = strcat(configdir_order, "/lowfetch/order"); 
+        strcpy(ascii_filename, getenv("XDG_CONFIG_HOME"));
+        strcat(ascii_filename, "/.config/lowfetch/ascii"); 
+        strcpy(order_filename, getenv("XDG_CONFIG_HOME"));
+        strcat(order_filename, "/.config/lowfetch/order"); 
     }
     else
     {
-        strcpy(configdir_ascii, getenv("HOME"));
-        strcpy(configdir_order, getenv("HOME"));
-        ascii_filename = strcat(configdir_ascii, "/.config/lowfetch/ascii"); 
-        order_filename = strcat(configdir_order, "/.config/lowfetch/order"); 
+        strcpy(ascii_filename, getenv("HOME"));
+        strcat(ascii_filename, "/.config/lowfetch/ascii"); 
+        strcpy(order_filename, getenv("HOME"));
+        strcat(order_filename, "/.config/lowfetch/order"); 
     }
     
     /* CLI argument parsing */
@@ -76,7 +74,7 @@ int main(int argc, char **argv)
                 use_ascii_file = true;
                 if (argv[i+1] && argv[i+1][0] != '-')
                 {
-                    ascii_filename = argv[i+1];
+                    strcpy(ascii_filename, argv[i+1]);
                 }
                 continue;
             }
@@ -85,7 +83,7 @@ int main(int argc, char **argv)
                 use_order_file = true;
                 if (argv[i+1] && argv[i+1][0] != '-')
                 {
-                    order_filename = argv[i+1];
+                    strcpy(order_filename, argv[i+1]);
                 }
                 continue;
             }
