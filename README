@@ -10,8 +10,7 @@ IN PROGRESS:
 * Make distro name prettier
 
 TODO:
-* Re-add option to shorten kernel name
--- It was removed due to unknown buggy behaviour
+* (null)
 
 (default) COMPILATION REQUIREMENTS:
 * GNU Make

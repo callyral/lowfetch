@@ -53,18 +53,19 @@ struct SystemInfo
 
 int main(int argc, char **argv)
 {
-    char accent_color_char = CHAR_WHITE; // white means no color
-    bool use_ascii_file = false;
-    bool use_order_file = false;
     bool accent_bold = false;
+    char accent_color_char = CHAR_WHITE; // white means no color
     
+    bool use_ascii_file = false;
     char ascii_filename[FILENAME_SIZE];
+    bool use_order_file = false;
     char order_filename[FILENAME_SIZE];
     /* use XDG_CONFIG_HOME if it exists, otherwise default to ~/.config/ */
     if (getenv("XDG_CONFIG_HOME"))
     {
         strcpy(ascii_filename, getenv("XDG_CONFIG_HOME"));
-        strcat(ascii_filename, "/lowfetch/ascii"); 
+        strcat(ascii_filename, "/lowfetch/ascii");
+
         strcpy(order_filename, getenv("XDG_CONFIG_HOME"));
         strcat(order_filename, "/lowfetch/order"); 
     }
@@ -72,20 +73,24 @@ int main(int argc, char **argv)
     {
         strcpy(ascii_filename, getenv("HOME"));
         strcat(ascii_filename, "/.config/lowfetch/ascii"); 
+
         strcpy(order_filename, getenv("HOME"));
         strcat(order_filename, "/.config/lowfetch/order"); 
     }
+
+    bool shorten_kernel_version = false;
     
     /* CLI argument parsing */
     /* format: { short, long, desc }*/
-    const char *argdef_help[] = {"-h", "--help", "show this help menu"};
-    const char *argdef_ascii_file[] = {"-a", "--ascii", "select ascii file"};
-    const char *argdef_order_file[] = {"-o", "--order", "select order file"};
-    const char *argdef_color[] = {"-c", "--color", "select color"};
-    const char *argdef_bold[] = {"-b", "--bold", "toggle bold colors"};
+    const char *argdef_help[] =           {"-h",  "--help",           "show this help menu"};
+    const char *argdef_ascii_file[] =     {"-a",  "--ascii",          "select ascii file"};
+    const char *argdef_order_file[] =     {"-o",  "--order",          "select order file"};
+    const char *argdef_color[] =          {"-c",  "--color",          "select color"};
+    const char *argdef_kernel_shorten[] = {"-ks", "--kernel-shorten", "shorten kernel version"};
+    const char *argdef_bold[] =           {"-b",  "--bold",           "toggle bold colors"};
     // arguments to include in help menu
-    #define ARGDEFS_LIST_SIZE 5
-    const char **argdefs_list[ARGDEFS_LIST_SIZE] = {argdef_help, argdef_ascii_file, argdef_order_file, argdef_color, argdef_bold};
+    #define ARGDEFS_LIST_SIZE 6
+    const char **argdefs_list[ARGDEFS_LIST_SIZE] = {argdef_help, argdef_ascii_file, argdef_order_file, argdef_kernel_shorten, argdef_color, argdef_bold};
     if (argc > 1)
     {
         for (int i = 1; i < argc; ++i)
@@ -116,6 +121,11 @@ int main(int argc, char **argv)
                 }
                 continue;
             }
+            if (arg_parse(argdef_kernel_shorten, argv[i]))
+            {
+                shorten_kernel_version = true;
+                continue;
+            }
             if (arg_parse(argdef_bold, argv[i]))
             {
                 accent_bold = true;
@@ -132,7 +142,7 @@ int main(int argc, char **argv)
     /* requires freeing */
     char *ascii = get_ascii(use_ascii_file, ascii_filename, ASCII_FILESIZE);
     char *distro_id = get_distro_id(DISTRO_ID_SIZE);
-    char *kernel_version = get_kernel_version(KERNEL_VERSION_SIZE);
+    char *kernel_version = get_kernel_version(shorten_kernel_version, KERNEL_VERSION_SIZE);
     char *package_amount = get_package_amount(PACKAGE_AMOUNT_SIZE);
     char *uptime = get_uptime(UPTIME_SIZE);
 
@@ -289,7 +299,7 @@ char *get_distro_id(size_t size)
     return distro_id;
 }
 
-char *get_kernel_version(size_t size)
+char *get_kernel_version(bool shorten, size_t size)
 {
     FILE *file = fopen("/proc/version", "r");
     if (!file)
@@ -298,13 +308,33 @@ char *get_kernel_version(size_t size)
         return NULL;
     }
 
-    char *kernel_version;
-    kernel_version = malloc((size+1)*sizeof(*kernel_version));
+    char *kernel_version = malloc((size+1)*sizeof(*kernel_version));
 
     fgets(kernel_version, size, file);
     kernel_version[strlen(kernel_version) - 1] = 0; // trim the traling newline
-    
+
     fclose(file);
+
+    if (shorten)
+    {
+        char *kernel_version_short = malloc((size+1)*sizeof(*kernel_version_short));
+        char *kernel_version_token = strtok(kernel_version, " ");
+
+        // loop until the third word
+        int i = 0;
+        while (kernel_version_token != NULL && i < 3) 
+        {
+            // concatenate token formatted with a space after
+            sprintf(kernel_version_short, "%s%s ", kernel_version_short, kernel_version_token);
+            // next token
+            kernel_version_token = strtok(NULL, " ");
+            ++i;
+        }
+
+        free(kernel_version);
+
+        return kernel_version_short;
+    }
 
     return kernel_version;
 }
