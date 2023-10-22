@@ -1,6 +1,15 @@
 #ifndef COLORS_H_
 #define COLORS_H_
 
+// color chars
+#define CHAR_WHITE   'w'
+#define CHAR_RED     'r'
+#define CHAR_GREEN   'g'
+#define CHAR_YELLOW  'y'
+#define CHAR_BLUE    'b'
+#define CHAR_MAGENTA 'm'
+#define CHAR_CYAN    'c'
+
 // colors
 #define ANSI_COLOR_RED     "\x1b[31m"
 #define ANSI_COLOR_GREEN   "\x1b[32m"

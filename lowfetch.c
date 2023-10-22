@@ -4,8 +4,14 @@
 #include <stdbool.h>
 #include <unistd.h>
 #include "lowfetch.h"
+
+/* modules*/
 #include "include/colors.h"
 #include "include/package_amount.h"
+#include "include/kernel_version.h"
+#include "include/lowfetch_base.h"
+
+/* size constants/macros */
 #define ASCII_FILESIZE 4096
 #define KERNEL_VERSION_SIZE 512
 #define FILENAME_SIZE 256
@@ -19,17 +25,6 @@ static char *ascii_default = " |\\'/-..--.\n"
                              " / _ _   ,  ;\n"
                              "`~=`Y'~_<._./\n"
                              " <`-....__.'";
-
-enum ColorChars
-{
-    CHAR_WHITE = 'w',
-    CHAR_RED = 'r',
-    CHAR_GREEN = 'g',
-    CHAR_YELLOW = 'y',
-    CHAR_BLUE = 'b',
-    CHAR_MAGENTA = 'm',
-    CHAR_CYAN = 'c'
-};
 
 enum SystemChars
 {
@@ -184,74 +179,6 @@ void help_menu_print(const char **argdefs_list[])
 }
 #undef ARGDEFS_LIST_SIZE
 
-char *file_read(const char *filename, size_t size)
-{
-    FILE *file = fopen(filename, "r");
-    if (!file)
-    {
-        fprintf(stderr, "error: '%s' is inaccessible or does not exist\n", filename);
-        return NULL;
-    }
-
-    char *output;
-    output = malloc((size+1)*sizeof(*output)); 
-
-    fread(output, size, 1, file); // store the file into output
-    output[strlen(output) - 1] = 0; // trim the trailing newline
-
-    fclose(file); // close the file since it's already been stored
-
-    return output;
-}
-
-char *get_ansi_color_from(char color_char, bool bold)
-{
-    if (!bold)
-    {
-        switch (color_char)
-        {
-            case CHAR_WHITE:
-                return ANSI_COLOR_RESET;
-            case CHAR_RED:
-                return ANSI_COLOR_RED;
-            case CHAR_GREEN:
-                return ANSI_COLOR_GREEN;
-            case CHAR_YELLOW:
-                return ANSI_COLOR_YELLOW;
-            case CHAR_BLUE:
-                return ANSI_COLOR_BLUE;
-            case CHAR_MAGENTA:
-                return ANSI_COLOR_MAGENTA;
-            case CHAR_CYAN:
-                return ANSI_COLOR_CYAN;
-            default:
-                return ANSI_COLOR_RESET;
-        }
-    }
-    else
-    {
-        switch (color_char)
-        {
-            case CHAR_WHITE:
-                return ANSI_COLOR_RESET_BOLD;
-            case CHAR_RED:
-                return ANSI_COLOR_RED_BOLD;
-            case CHAR_GREEN:
-                return ANSI_COLOR_GREEN_BOLD;
-            case CHAR_YELLOW:
-                return ANSI_COLOR_YELLOW_BOLD;
-            case CHAR_BLUE:
-                return ANSI_COLOR_BLUE_BOLD;
-            case CHAR_MAGENTA:
-                return ANSI_COLOR_MAGENTA_BOLD;
-            case CHAR_CYAN:
-                return ANSI_COLOR_CYAN_BOLD;
-            default:
-                return ANSI_COLOR_RESET_BOLD;
-        }
-    }
-}
-
 char *get_ascii(bool use_file, const char *filename, size_t size)
 {
     char *ascii;
@@ -297,46 +224,6 @@ char *get_distro_id(size_t size)
     fclose(file);
     
     return distro_id;
-}
-
-char *get_kernel_version(bool shorten, size_t size)
-{
-    FILE *file = fopen("/proc/version", "r");
-    if (!file)
-    {
-        fprintf(stderr, "error: '/proc/version' (kernel information) is unreadable\n");
-        return NULL;
-    }
-
-    char *kernel_version = malloc((size+1)*sizeof(*kernel_version));
-
-    fgets(kernel_version, size, file);
-    kernel_version[strlen(kernel_version) - 1] = 0; // trim the traling newline
-
-    fclose(file);
-
-    if (shorten)
-    {
-        char *kernel_version_short = malloc((size+1)*sizeof(*kernel_version_short));
-        char *kernel_version_token = strtok(kernel_version, " ");
-
-        // loop until the third word
-        int i = 0;
-        while (kernel_version_token != NULL && i < 3) 
-        {
-            // concatenate token formatted with a space after
-            sprintf(kernel_version_short, "%s%s ", kernel_version_short, kernel_version_token);
-            // next token
-            kernel_version_token = strtok(NULL, " ");
-            ++i;
-        }
-
-        free(kernel_version);
-
-        return kernel_version_short;
-    }
-
-    return kernel_version;
 }
 
 char *get_shell()

@@ -7,10 +7,10 @@ GOALS:
 * Few/no runtime dependencies
 
 IN PROGRESS:
-* Make distro name prettier
+* Modularize code
 
 TODO:
-* (null)
+* Make distro name prettier
 
 (default) COMPILATION REQUIREMENTS:
 * GNU Make

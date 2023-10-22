@@ -10,12 +10,8 @@ struct SystemInfo;
 bool arg_parse(const char *argdef[], const char *string);
 void help_menu_print(const char **argdefs_list[]);
 
-char *file_read(const char *filename, size_t size); // read from a file, requires freeing the assigned variable later
-
-char *get_ansi_color_from(char color_char, bool bold);
 char *get_ascii(bool use_file, const char *filename, size_t size);
 char *get_distro_id(size_t size);
-char *get_kernel_version(bool shorten, size_t size);
 char *get_shell();
 char *get_uptime(size_t size);
 
