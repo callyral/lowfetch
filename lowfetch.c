@@ -207,7 +207,6 @@ char *get_ascii(bool use_file, const char *filename, size_t size)
 
 char *get_distro_id(size_t size)
 {
-    /* TODO: parser for /etc/os-release */
     FILE *file = fopen("/etc/os-release", "r");
     if (!file)
     {
@@ -218,10 +217,26 @@ char *get_distro_id(size_t size)
     char *distro_id;
     distro_id = malloc((size+1)*sizeof(*distro_id));
 
-    fgets(distro_id, size, file);
+    fgets(distro_id, size, file); // get the first line (NAME="Distro")
+    fclose(file);
+
     distro_id[strlen(distro_id) - 1] = 0; // trim the trailing newline
 
-    fclose(file);
+    
+    char *distro_id_token = strtok(distro_id, "=");
+    
+    // get what is after the "=" (if it's NAME="Distro", you get "Distro" with the quotes)
+    int i = 0;
+    while (distro_id_token != NULL && i < 2)
+    {
+        strcpy(distro_id, distro_id_token);
+        distro_id_token = strtok(NULL, "=");
+        ++i;
+    }
+    // remove first quote
+    // distro[0] = 0; does not work since it would remove the pointer
+    memmove(distro_id, distro_id+1, strlen(distro_id)); 
+    distro_id[strlen(distro_id) - 1] = 0; // remove end quote
     
     return distro_id;
 }

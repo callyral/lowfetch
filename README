@@ -10,7 +10,7 @@ IN PROGRESS:
 * Modularize code
 
 TODO:
-* Make distro name prettier
+* (null)
 
 (default) COMPILATION REQUIREMENTS:
 * GNU Make
@@ -20,6 +20,17 @@ command: make build
 
 NOTES:
 * There is no planned support for non-Linux operating systems
+
+ASSUMPTIONS:
+    Assumptions this programs makes. Feel free to make an issue if it breaks on Linux.
+* You use a Linux-based OS
+* /etc/os-release exists
+* The first line in /etc/os-release is NAME="Distro Name"
+* /proc/version exists
+* /proc/uptime exists
+* Either $HOME or $XDG_CONFIG_HOME are defined
+* $SHELL is defined
+* You have a package manager (dpkg, dnf, xpbs or pacman) - support for more may be added
 
 DOCUMENTATION:
 ascii file (xdg-config/lowfetch/ascii):
