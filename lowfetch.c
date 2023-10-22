@@ -10,15 +10,8 @@
 #include "include/package_amount.h"
 #include "include/kernel_version.h"
 #include "include/lowfetch_base.h"
-
-/* size constants/macros */
-#define ASCII_FILESIZE 4096
-#define KERNEL_VERSION_SIZE 512
-#define FILENAME_SIZE 256
-#define DISTRO_ID_SIZE 256
-#define UPTIME_SIZE 256
-#define ORDER_FILESIZE 128
-#define PACKAGE_AMOUNT_SIZE 32
+#include "include/argument_parsing.h"
+#include "include/sizes.h"
 
 /* from https://www.asciiart.eu/animals/cats */
 static char *ascii_default = " |\\'/-..--.\n"
@@ -81,58 +74,23 @@ int main(int argc, char **argv)
     const char *argdef_ascii_file[] =     {"-a",  "--ascii",          "select ascii file"};
     const char *argdef_order_file[] =     {"-o",  "--order",          "select order file"};
     const char *argdef_color[] =          {"-c",  "--color",          "select color"};
-    const char *argdef_kernel_shorten[] = {"-ks", "--kernel-shorten", "shorten kernel version"};
     const char *argdef_bold[] =           {"-b",  "--bold",           "toggle bold colors"};
+    const char *argdef_kernel_shorten[] = {"-ks", "--kernel-shorten", "shorten kernel version"};
     // arguments to include in help menu
+    // note: new arguments must be appended to end of argdefs_list
     #define ARGDEFS_LIST_SIZE 6
-    const char **argdefs_list[ARGDEFS_LIST_SIZE] = {argdef_help, argdef_ascii_file, argdef_order_file, argdef_kernel_shorten, argdef_color, argdef_bold};
-    if (argc > 1)
-    {
-        for (int i = 1; i < argc; ++i)
-        {
-            if (arg_parse(argdef_ascii_file, argv[i]))
-            {
-                use_ascii_file = true;
-                if (argv[i+1] && argv[i+1][0] != '-')
-                {
-                    strcpy(ascii_filename, argv[i+1]);
-                }
-                continue;
-            }
-            if (arg_parse(argdef_order_file, argv[i]))
-            {
-                use_order_file = true;
-                if (argv[i+1] && argv[i+1][0] != '-')
-                {
-                    strcpy(order_filename, argv[i+1]);
-                }
-                continue;
-            }
-            if (arg_parse(argdef_color, argv[i]))
-            {
-                if (argv[i+1] && argv[i+1][0] != '-')
-                {
-                    accent_color_char = argv[i+1][0];
-                }
-                continue;
-            }
-            if (arg_parse(argdef_kernel_shorten, argv[i]))
-            {
-                shorten_kernel_version = true;
-                continue;
-            }
-            if (arg_parse(argdef_bold, argv[i]))
-            {
-                accent_bold = true;
-                continue;
-            }
-            if (arg_parse(argdef_help, argv[i]))
-            {
-                help_menu_print(argdefs_list);
-                return 0;
-            }
-        }
-    }
+    const char **argdefs_list[ARGDEFS_LIST_SIZE] = {argdef_help, argdef_ascii_file, argdef_order_file, argdef_color, argdef_bold, argdef_kernel_shorten};
+    struct Options option = argument_parsing(argc, argv, argdefs_list, ARGDEFS_LIST_SIZE);
+    #undef ARGDEFS_LIST_SIZE
+
+    // use arguments
+    use_ascii_file = option.use_ascii_file;
+    use_order_file = option.use_order_file;
+    accent_bold = option.accent_bold;
+    shorten_kernel_version = option.shorten_kernel_version;
+    if (strcmp("", option.ascii_filename)!=0) { strcpy(ascii_filename, option.ascii_filename); }
+    if (strcmp("", option.order_filename)!=0) { strcpy(order_filename, option.order_filename); }
+    accent_color_char = option.accent_color_char;
 
     /* requires freeing */
     char *ascii = get_ascii(use_ascii_file, ascii_filename, ASCII_FILESIZE);
@@ -163,21 +121,6 @@ int main(int argc, char **argv)
     free(uptime);
     return 0;
 }
-
-bool arg_parse(const char *argdef[], const char *string)
-{
-    return strcmp(string, argdef[0]) == 0 || strcmp(string, argdef[1]) == 0;
-}
-
-void help_menu_print(const char **argdefs_list[])
-{
-    printf("usage: lowfetch [options]\n");
-    for(int i = 0; i < ARGDEFS_LIST_SIZE; ++i)
-    {
-        printf("%s, %s,\t%s\n", argdefs_list[i][0], argdefs_list[i][1], argdefs_list[i][2]);
-    }
-}
-#undef ARGDEFS_LIST_SIZE
 
 char *get_ascii(bool use_file, const char *filename, size_t size)
 {
