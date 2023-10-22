@@ -15,7 +15,7 @@ char *file_read(const char *filename, size_t size); // read from a file, require
 char *get_ansi_color_from(char color_char, bool bold);
 char *get_ascii(bool use_file, const char *filename, size_t size);
 char *get_distro_id(size_t size);
-char *get_kernel_version(bool shorten, size_t size);
+char *get_kernel_version(size_t size);
 char *get_shell();
 char *get_uptime(size_t size);
 
