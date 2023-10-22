@@ -1,2 +1,4 @@
-lowfetch
-debug
+build/
+build/**
+debug/
+debug/**

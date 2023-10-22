@@ -1,19 +1,21 @@
 CC = clang
 CFLAGS = -std=c99 -fuse-ld=mold -Wall -O3
 DEBUGFLAGS = -std=c99 -fuse-ld=mold -Wall -g -O0
-SRC = lowfetch.c include/lowfetch_base.c include/package_amount.c include/kernel_version.c include/argument_parsing.c
+SRC = src/lowfetch.c src/include/lowfetch_base.c src/include/package_amount.c src/include/kernel_version.c src/include/argument_parsing.c
 
 all: build run
 
-build: lowfetch.c
-	$(CC) $(SRC) -o lowfetch $(CFLAGS)
+build: $(SRC)
+	mkdir build/
+	$(CC) $(SRC) -o build/lowfetch $(CFLAGS)
 
-debug: lowfetch.c
-	$(CC) $(SRC) -o debug $(DEBUGFLAGS)
-	gdb debug
+debug: $(SRC)
+	mkdir debug/
+	$(CC) $(SRC) -o debug/lowfetch $(DEBUGFLAGS)
+	gdb debug/lowfetch
 
-run: lowfetch
-	./lowfetch
+run: build/lowfetch
+	./build/lowfetch
 
 clean:
-	rm -f lowfetch debug
+	rm -rf build/ debug/
