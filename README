@@ -25,5 +25,5 @@ DOCUMENTATION:
 ascii file (xdg-config/lowfetch/ascii):
     format: text
 order file (xdg-config/lowfetch/order):
-    format: [a]scii [d]istro [k]ernel [s]hell [u]ptime
-    example: aduks
+    format: [a]scii [d]istro [k]ernel [p]ackage amount [s]hell [u]ptime
+    example: adukspa

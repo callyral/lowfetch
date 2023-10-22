@@ -5,12 +5,14 @@
 #include <unistd.h>
 #include "lowfetch.h"
 #include "include/colors.h"
+#include "include/package_amount.h"
 #define ASCII_FILESIZE 4096
 #define KERNEL_VERSION_SIZE 512
 #define FILENAME_SIZE 256
 #define DISTRO_ID_SIZE 256
 #define UPTIME_SIZE 256
 #define ORDER_FILESIZE 128
+#define PACKAGE_AMOUNT_SIZE 32
 
 /* from https://www.asciiart.eu/animals/cats */
 static char *ascii_default = " |\\'/-..--.\n"
@@ -34,6 +36,7 @@ enum SystemChars
     CHAR_ASCII = 'a',
     CHAR_DISTRO_ID = 'd',
     CHAR_KERNEL_VERSION = 'k',
+    CHAR_PACKAGE_AMOUNT = 'p',
     CHAR_SHELL = 's',
     CHAR_UPTIME = 'u'
 };
@@ -43,6 +46,7 @@ struct SystemInfo
     char *ascii;
     char *distro_id;
     char *kernel_version;
+    char *package_amount;
     char *shell;
     char *uptime;
 };
@@ -136,18 +140,28 @@ int main(int argc, char **argv)
     char *ascii = get_ascii(use_ascii_file, ascii_filename, ASCII_FILESIZE);
     char *distro_id = get_distro_id(DISTRO_ID_SIZE);
     char *kernel_version = get_kernel_version(kernel_version_shorten, KERNEL_VERSION_SIZE);
+    char *package_amount = get_package_amount(PACKAGE_AMOUNT_SIZE);
     char *uptime = get_uptime(UPTIME_SIZE);
 
     /* does not require freeing */
     char *shell = get_shell();
 
-    struct SystemInfo system_info = {.ascii = ascii, .distro_id = distro_id, .kernel_version = kernel_version, .shell = shell, .uptime = uptime};
+    struct SystemInfo system_info = 
+    {
+        .ascii = ascii,
+        .distro_id = distro_id,
+        .kernel_version = kernel_version,
+        .package_amount = package_amount,
+        .shell = shell,
+        .uptime = uptime
+    };
 
     info_print(accent_color_char, accent_bold, use_order_file, order_filename, ORDER_FILESIZE, system_info);
-    
+
     free(ascii);
     free(distro_id);
     free(kernel_version);
+    free(package_amount);
     free(uptime);
     return 0;
 }
@@ -274,7 +288,8 @@ char *get_distro_id(size_t size)
     char *distro_id;
     distro_id = malloc((size+1)*sizeof(*distro_id));
 
-    fscanf(file, "%s", distro_id);
+    fgets(distro_id, size, file);
+    distro_id[strlen(distro_id) - 1] = 0; // trim the trailing newline
 
     fclose(file);
     
@@ -303,9 +318,10 @@ char *get_kernel_version(bool shorten, size_t size)
         for (int i = 0; i < 3; ++i)
         {
             fscanf(file, "%s", temp);
-            sprintf(temp, "%s ", temp);
+            strcat(temp, " ");
             strcat(kernel_version, temp);
         }
+        free(temp);
     }
     
     fclose(file);
@@ -364,24 +380,21 @@ char *get_uptime(size_t size)
     return uptime;
 }
 
-int info_print(char accent_color_char, bool accent_bold, bool use_order_file, char *order_filename, size_t order_filesize, struct SystemInfo system_info)
+void info_print(char accent_color_char, bool accent_bold, bool use_order_file, char *order_filename, size_t order_filesize, struct SystemInfo system_info)
 {
     char *ansi_accent_color = get_ansi_color_from(accent_color_char, accent_bold);
     char *order;
     order = malloc((order_filesize+1)*sizeof(*order));
-    if (!use_order_file)
-    {
-        sprintf(order, "%c%c%c%c%c", CHAR_ASCII, CHAR_DISTRO_ID, CHAR_SHELL, CHAR_UPTIME, CHAR_KERNEL_VERSION);
-    }
-    else if (access(order_filename, R_OK) == -1)
+    sprintf(order, "%c%c%c%c%c%c", CHAR_ASCII, CHAR_DISTRO_ID, CHAR_PACKAGE_AMOUNT, CHAR_SHELL, CHAR_UPTIME, CHAR_KERNEL_VERSION);
+    if (access(order_filename, R_OK) == -1)
     {
         fprintf(stderr, "error: '%s' is unreadable or doesn't exist\n", order_filename);
-        sprintf(order, "%c%c%c%c%c", CHAR_ASCII, CHAR_DISTRO_ID, CHAR_SHELL, CHAR_UPTIME, CHAR_KERNEL_VERSION);
     }
-    else
+    else if (use_order_file)
     {
         order = file_read(order_filename, order_filesize);
     }
+
 
     for (int i = 0; i <= sizeof(order); ++i)
     {
@@ -389,12 +402,11 @@ int info_print(char accent_color_char, bool accent_bold, bool use_order_file, ch
             case CHAR_ASCII:          printf("%s%s%s\n",         ansi_accent_color, system_info.ascii, ANSI_COLOR_RESET); break;
             case CHAR_DISTRO_ID:      printf("%sdistro:%s %s\n", ansi_accent_color, ANSI_COLOR_RESET,  system_info.distro_id); break;
             case CHAR_KERNEL_VERSION: printf("%skernel:%s %s\n", ansi_accent_color, ANSI_COLOR_RESET,  system_info.kernel_version); break;
-            case CHAR_SHELL:          printf("%sshell:%s %s\n",  ansi_accent_color, ANSI_COLOR_RESET,  system_info.shell); break;
-            case CHAR_UPTIME:         printf("%suptime:%s %s\n", ansi_accent_color, ANSI_COLOR_RESET,  system_info.uptime);
+            case CHAR_PACKAGE_AMOUNT: printf("%spkgs:%s   %s\n", ansi_accent_color, ANSI_COLOR_RESET,  system_info.package_amount); break;
+            case CHAR_SHELL:          printf("%sshell:%s  %s\n", ansi_accent_color, ANSI_COLOR_RESET,  system_info.shell); break;
+            case CHAR_UPTIME:         printf("%suptime:%s %s\n", ansi_accent_color, ANSI_COLOR_RESET,  system_info.uptime); break;
         }
     }
 
     free(order);
-
-    return 0;
 }

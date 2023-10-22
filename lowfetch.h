@@ -19,6 +19,6 @@ char *get_kernel_version(bool shorten, size_t size);
 char *get_shell();
 char *get_uptime(size_t size);
 
-int info_print(char accent_color_char, bool accent_bold, bool use_order_file, char *order_filename, size_t order_file_size, struct SystemInfo system_info);
+void info_print(char accent_color_char, bool accent_bold, bool use_order_file, char *order_filename, size_t order_file_size, struct SystemInfo system_info);
 
 #endif
