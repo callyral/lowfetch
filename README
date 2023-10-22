@@ -27,3 +27,11 @@ ascii file (xdg-config/lowfetch/ascii):
 order file (xdg-config/lowfetch/order):
     format: [a]scii [d]istro [k]ernel [p]ackage amount [s]hell [u]ptime
     example: adukspa
+color options:
+    [w]hite
+    [r]ed
+    [g]reen
+    [y]ellow
+    [b]lue
+    [m]agenta
+    [c]yan
