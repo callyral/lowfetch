@@ -47,3 +47,15 @@ color options:
     [b]lue
     [m]agenta
     [c]yan
+
+EXAMPLE OUTPUT (with --kernel-shorten):
+   |\'/-..--.
+   / _ _   ,  ;
+  `~=`Y'~_<._./
+   <`-....__.'
+  distro: Void
+  xdg:    sway
+  pkgs:   896
+  shell:  /bin/zsh
+  uptime: 3192 minutes and 47 seconds
+  kernel: Linux version 6.5.8_1 
