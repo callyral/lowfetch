@@ -29,6 +29,7 @@ ASSUMPTIONS:
 * /proc/version exists
 * /proc/uptime exists
 * Either $HOME or $XDG_CONFIG_HOME are defined
+* Either $XDG_CURRENT_DESKTOP or $XDG_SESSION_DESKTOP are defined
 * $SHELL is defined
 * You have a package manager (dpkg, dnf, xpbs or pacman) - support for more may be added
 
@@ -36,8 +37,8 @@ DOCUMENTATION:
 ascii file (xdg-config/lowfetch/ascii):
     format: text
 order file (xdg-config/lowfetch/order):
-    format: [a]scii [d]istro [k]ernel [p]ackage amount [s]hell [u]ptime
-    example: adukspa
+    format: [a]scii [d]istro [k]ernel [p]ackage amount [s]hell [u]ptime [x]dg
+    example: adukspax
 color options:
     [w]hite
     [r]ed

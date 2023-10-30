@@ -6,10 +6,12 @@ SRC = src/lowfetch.c src/include/lowfetch_base.c src/include/package_amount.c sr
 all: build run
 
 build: $(SRC)
+	rm -rf build/
 	mkdir build/
 	$(CC) $(SRC) -o build/lowfetch $(CFLAGS)
 
 debug: $(SRC)
+	rm -rf debug/
 	mkdir debug/
 	$(CC) $(SRC) -o debug/lowfetch $(DEBUGFLAGS)
 	gdb debug/lowfetch

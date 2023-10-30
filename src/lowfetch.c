@@ -6,7 +6,7 @@
 #include "lowfetch.h"
 
 /* modules*/
-#include "include/colors.h"
+#include "include/color_definitions.h"
 #include "include/package_amount.h"
 #include "include/kernel_version.h"
 #include "include/lowfetch_base.h"
@@ -26,7 +26,8 @@ enum SystemChars
     CHAR_KERNEL_VERSION = 'k',
     CHAR_PACKAGE_AMOUNT = 'p',
     CHAR_SHELL = 's',
-    CHAR_UPTIME = 'u'
+    CHAR_UPTIME = 'u',
+    CHAR_XDG_DESKTOP = 'x'
 };
 
 struct SystemInfo
@@ -37,6 +38,7 @@ struct SystemInfo
     char *package_amount;
     char *shell;
     char *uptime;
+    char *xdg_desktop;
 };
 
 int main(int argc, char **argv)
@@ -101,6 +103,7 @@ int main(int argc, char **argv)
 
     /* does not require freeing */
     char *shell = get_shell();
+    char *xdg_desktop = get_xdg_desktop();
 
     struct SystemInfo system_info = 
     {
@@ -109,7 +112,8 @@ int main(int argc, char **argv)
         .kernel_version = kernel_version,
         .package_amount = package_amount,
         .shell = shell,
-        .uptime = uptime
+        .uptime = uptime,
+        .xdg_desktop = xdg_desktop
     };
 
     info_print(accent_color_char, accent_bold, use_order_file, order_filename, ORDER_FILESIZE, system_info);
@@ -235,12 +239,25 @@ char *get_uptime(size_t size)
     return uptime;
 }
 
+char *get_xdg_desktop() {
+    // this prefers $XDG_CURRENT_DESKTOP over $XDG_SESSION_DESKTOP
+    if (!getenv("XDG_SESSION_DESKTOP") && !getenv("XDG_CURRENT_DESKTOP")) {
+        return "unknown";
+    }
+    
+    if (getenv("XDG_CURRENT_DESKTOP")) {
+        return getenv("XDG_CURRENT_DESKTOP");
+    }
+    
+    return getenv("XDG_SESSION_DESKTOP");
+}
+
 void info_print(char accent_color_char, bool accent_bold, bool use_order_file, char *order_filename, size_t order_filesize, struct SystemInfo system_info)
 {
     char *ansi_accent_color = get_ansi_color_from(accent_color_char, accent_bold);
     char *order;
     order = malloc((order_filesize+1)*sizeof(*order));
-    sprintf(order, "%c%c%c%c%c%c", CHAR_ASCII, CHAR_DISTRO_ID, CHAR_PACKAGE_AMOUNT, CHAR_SHELL, CHAR_UPTIME, CHAR_KERNEL_VERSION);
+    sprintf(order, "%c%c%c%c%c%c%c", CHAR_ASCII, CHAR_DISTRO_ID, CHAR_XDG_DESKTOP, CHAR_PACKAGE_AMOUNT, CHAR_SHELL, CHAR_UPTIME, CHAR_KERNEL_VERSION);
     if (access(order_filename, R_OK) == -1)
     {
         fprintf(stderr, "error: '%s' is unreadable or doesn't exist\n", order_filename);
@@ -260,6 +277,7 @@ void info_print(char accent_color_char, bool accent_bold, bool use_order_file, c
             case CHAR_PACKAGE_AMOUNT: printf("%spkgs:%s   %s\n", ansi_accent_color, ANSI_COLOR_RESET,  system_info.package_amount); break;
             case CHAR_SHELL:          printf("%sshell:%s  %s\n", ansi_accent_color, ANSI_COLOR_RESET,  system_info.shell); break;
             case CHAR_UPTIME:         printf("%suptime:%s %s\n", ansi_accent_color, ANSI_COLOR_RESET,  system_info.uptime); break;
+            case CHAR_XDG_DESKTOP:    printf("%sxdg:%s    %s\n", ansi_accent_color, ANSI_COLOR_RESET,  system_info.xdg_desktop); break;
         }
     }
 

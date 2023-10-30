@@ -14,6 +14,7 @@ char *get_ascii(bool use_file, const char *filename, size_t size);
 char *get_distro_id(size_t size);
 char *get_shell();
 char *get_uptime(size_t size);
+char *get_xdg_desktop();
 
 void info_print(char accent_color_char, bool accent_bold, bool use_order_file, char *order_filename, size_t order_file_size, struct SystemInfo system_info);
 

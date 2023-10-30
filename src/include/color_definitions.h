@@ -1,5 +1,5 @@
-#ifndef COLORS_H_
-#define COLORS_H_
+#ifndef COLOR_DEFINITIONS_H_
+#define COLOR_DEFINITIONS_H_
 
 // color chars
 #define CHAR_WHITE   'w'

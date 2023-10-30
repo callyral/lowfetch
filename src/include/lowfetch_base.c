@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
-#include "colors.h"
+#include "color_definitions.h"
 #include "lowfetch_base.h"
 
 char *file_read(const char *filename, size_t size)
