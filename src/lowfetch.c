@@ -101,19 +101,15 @@ int main(int argc, char **argv)
     char *package_amount = get_package_amount(PACKAGE_AMOUNT_SIZE);
     char *uptime = get_uptime(UPTIME_SIZE);
 
-    /* does not require freeing */
-    char *shell = get_shell();
-    char *xdg_desktop = get_xdg_desktop();
-
     struct SystemInfo system_info = 
     {
         .ascii = ascii,
         .distro_id = distro_id,
         .kernel_version = kernel_version,
         .package_amount = package_amount,
-        .shell = shell,
+        .shell = get_shell(),
         .uptime = uptime,
-        .xdg_desktop = xdg_desktop
+        .xdg_desktop = get_xdg_desktop()
     };
 
     info_print(accent_color_char, accent_bold, use_order_file, order_filename, ORDER_FILESIZE, system_info);
