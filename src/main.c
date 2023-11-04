@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
-#include "main.h"
 
 /* modules*/
 #include "include/general/file_read.h"
