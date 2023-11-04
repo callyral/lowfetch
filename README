@@ -7,10 +7,10 @@ GOALS:
 * Few/no runtime dependencies
 
 IN PROGRESS:
-* Modularize code
+* Modularize, organize and refactor code
 
 TODO:
-* (null)
+* Rewrite argument parsing
 
 (default) COMPILATION REQUIREMENTS:
 * GNU Make

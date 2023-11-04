@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
-#include <unistd.h>
 #include "main.h"
 
 /* modules*/
@@ -15,34 +14,9 @@
 #include "include/uptime/uptime.h"
 #include "include/distro/distro.h"
 #include "include/shell/shell.h"
-
-/* from https://www.asciiart.eu/animals/cats */
-static char *ascii_default = " |\\'/-..--.\n"
-                             " / _ _   ,  ;\n"
-                             "`~=`Y'~_<._./\n"
-                             " <`-....__.'";
-
-enum SystemChars
-{
-    CHAR_ASCII = 'a',
-    CHAR_DISTRO_ID = 'd',
-    CHAR_KERNEL_VERSION = 'k',
-    CHAR_PACKAGE_AMOUNT = 'p',
-    CHAR_SHELL = 's',
-    CHAR_UPTIME = 'u',
-    CHAR_XDG_DESKTOP = 'x'
-};
-
-struct SystemInfo
-{
-    char *ascii;
-    char *distro_id;
-    char *kernel_version;
-    char *package_amount;
-    char *shell;
-    char *uptime;
-    char *xdg_desktop;
-};
+#include "include/session/session.h"
+#include "include/output/output.h"
+#include "include/ascii/ascii.h"
 
 int main(int argc, char **argv)
 {
@@ -112,7 +86,7 @@ int main(int argc, char **argv)
         .package_amount = package_amount,
         .shell = get_shell(),
         .uptime = uptime,
-        .xdg_desktop = get_xdg_desktop()
+        .xdg_desktop = get_desktop_session()
     };
 
     info_print(accent_color_char, accent_bold, use_order_file, order_filename, ORDER_FILESIZE, system_info);
@@ -123,75 +97,4 @@ int main(int argc, char **argv)
     free(package_amount);
     free(uptime);
     return 0;
-}
-
-char *get_ascii(bool use_file, const char *filename, size_t size)
-{
-    char *ascii;
-
-    if (!use_file)
-    {
-        ascii = malloc((size+1) * sizeof(*ascii));
-        strcpy(ascii, ascii_default);
-        return ascii;
-    }
-
-    if (access(filename, R_OK) == -1)
-    {
-        fprintf(stderr, "error: '%s' is unreadable or doesn't exist\n", filename);
-
-        ascii = malloc((size+1) * sizeof(*ascii));
-        strcpy(ascii, ascii_default);
-        return ascii;
-    }
-    else 
-    {
-        ascii = file_read(filename, size);
-        return ascii;
-    }
-}
-
-char *get_xdg_desktop() {
-    // this prefers $XDG_CURRENT_DESKTOP over $XDG_SESSION_DESKTOP
-    if (!getenv("XDG_SESSION_DESKTOP") && !getenv("XDG_CURRENT_DESKTOP")) {
-        return "unknown";
-    }
-
-    if (getenv("XDG_CURRENT_DESKTOP")) {
-        return getenv("XDG_CURRENT_DESKTOP");
-    }
-
-    return getenv("XDG_SESSION_DESKTOP");
-}
-
-void info_print(char accent_color_char, bool accent_bold, bool use_order_file, char *order_filename, size_t order_filesize, struct SystemInfo system_info)
-{
-    char *ansi_accent_color = get_ansi_color_from(accent_color_char, accent_bold);
-    char *order;
-    order = malloc((order_filesize+1)*sizeof(*order));
-    sprintf(order, "%c%c%c%c%c%c%c", CHAR_ASCII, CHAR_DISTRO_ID, CHAR_XDG_DESKTOP, CHAR_PACKAGE_AMOUNT, CHAR_SHELL, CHAR_UPTIME, CHAR_KERNEL_VERSION);
-    if (access(order_filename, R_OK) == -1)
-    {
-        fprintf(stderr, "error: '%s' is unreadable or doesn't exist\n", order_filename);
-    }
-    else if (use_order_file)
-    {
-        order = file_read(order_filename, order_filesize);
-    }
-
-
-    for (int i = 0; i <= sizeof(order); ++i)
-    {
-        switch (order[i]) {
-            case CHAR_ASCII:          printf("%s%s%s\n",         ansi_accent_color, system_info.ascii, ANSI_COLOR_RESET); break;
-            case CHAR_DISTRO_ID:      printf("%sdistro:%s %s\n", ansi_accent_color, ANSI_COLOR_RESET,  system_info.distro_id); break;
-            case CHAR_KERNEL_VERSION: printf("%skernel:%s %s\n", ansi_accent_color, ANSI_COLOR_RESET,  system_info.kernel_version); break;
-            case CHAR_PACKAGE_AMOUNT: printf("%spkgs:%s   %s\n", ansi_accent_color, ANSI_COLOR_RESET,  system_info.package_amount); break;
-            case CHAR_SHELL:          printf("%sshell:%s  %s\n", ansi_accent_color, ANSI_COLOR_RESET,  system_info.shell); break;
-            case CHAR_UPTIME:         printf("%suptime:%s %s\n", ansi_accent_color, ANSI_COLOR_RESET,  system_info.uptime); break;
-            case CHAR_XDG_DESKTOP:    printf("%sxdg:%s    %s\n", ansi_accent_color, ANSI_COLOR_RESET,  system_info.xdg_desktop); break;
-        }
-    }
-
-    free(order);
 }
