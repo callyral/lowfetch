@@ -3,16 +3,18 @@
 #include <string.h>
 #include <stdbool.h>
 #include <unistd.h>
-#include "lowfetch.h"
+#include "main.h"
 
 /* modules*/
-#include "include/color_definitions.h"
-#include "include/package_amount.h"
-#include "include/kernel_version.h"
-#include "include/lowfetch_base.h"
-#include "include/argument_parsing.h"
-#include "include/uptime.h"
-#include "include/sizes.h"
+#include "include/general/file_read.h"
+#include "include/definitions/colors.h"
+#include "include/definitions/sizes.h"
+#include "include/package_amount/package_amount.h"
+#include "include/kernel/kernel.h"
+#include "include/argument_parsing/argument_parsing.h"
+#include "include/uptime/uptime.h"
+#include "include/distro/distro.h"
+#include "include/shell/shell.h"
 
 /* from https://www.asciiart.eu/animals/cats */
 static char *ascii_default = " |\\'/-..--.\n"
@@ -45,8 +47,8 @@ struct SystemInfo
 int main(int argc, char **argv)
 {
     bool accent_bold = false;
-    char accent_color_char = CHAR_WHITE; // white means no color
-    
+    char accent_color_char = CHAR_WHITE;
+
     bool use_ascii_file = false;
     char ascii_filename[FILENAME_SIZE];
     bool use_order_file = false;
@@ -70,7 +72,7 @@ int main(int argc, char **argv)
     }
 
     bool shorten_kernel_version = false;
-    
+
     /* CLI argument parsing */
     /* format: { short, long, desc }*/
     const char *argdef_help[] =           {"-h",  "--help",           "show this help menu"};
@@ -98,7 +100,7 @@ int main(int argc, char **argv)
     /* requires freeing */
     char *ascii = get_ascii(use_ascii_file, ascii_filename, ASCII_FILESIZE);
     char *distro_id = get_distro_id(DISTRO_ID_SIZE);
-    char *kernel_version = get_kernel_version(shorten_kernel_version, KERNEL_VERSION_SIZE);
+    char *kernel_version = get_kernel_version(shorten_kernel_version, KERNEL_SIZE);
     char *package_amount = get_package_amount(PACKAGE_AMOUNT_SIZE);
     char *uptime = get_uptime(UPTIME_SIZE);
 
@@ -130,7 +132,7 @@ char *get_ascii(bool use_file, const char *filename, size_t size)
     if (!use_file)
     {
         ascii = malloc((size+1) * sizeof(*ascii));
-        strcpy(ascii, ascii_default); // copy ascii_default into ascii
+        strcpy(ascii, ascii_default);
         return ascii;
     }
 
@@ -149,64 +151,16 @@ char *get_ascii(bool use_file, const char *filename, size_t size)
     }
 }
 
-char *get_distro_id(size_t size)
-{
-    FILE *file = fopen("/etc/os-release", "r");
-    if (!file)
-    {
-        fprintf(stderr, "error: '/etc/os-release' is unreadable or doesn't exist\n");
-        return NULL;
-    }
-
-    char *distro_id;
-    distro_id = malloc((size+1)*sizeof(*distro_id));
-
-    fgets(distro_id, size, file); // get the first line (NAME="Distro")
-    fclose(file);
-
-    distro_id[strlen(distro_id) - 1] = 0; // trim the trailing newline
-
-    
-    char *distro_id_token = strtok(distro_id, "=");
-    
-    // get what is after the "=" (if it's NAME="Distro", you get "Distro" with the quotes)
-    int i = 0;
-    while (distro_id_token != NULL && i < 2)
-    {
-        strcpy(distro_id, distro_id_token);
-        distro_id_token = strtok(NULL, "=");
-        ++i;
-    }
-    // remove first quote
-    // distro[0] = 0; does not work since it would remove the pointer
-    memmove(distro_id, distro_id+1, strlen(distro_id)); 
-    distro_id[strlen(distro_id) - 1] = 0; // remove end quote
-    
-    return distro_id;
-}
-
-char *get_shell()
-{
-    char *shell = getenv("SHELL");
-    if (!shell)
-    {
-        fprintf(stderr, "error: $SHELL is unknown\n");
-        return NULL;
-    }
-
-    return shell;
-}
-
 char *get_xdg_desktop() {
     // this prefers $XDG_CURRENT_DESKTOP over $XDG_SESSION_DESKTOP
     if (!getenv("XDG_SESSION_DESKTOP") && !getenv("XDG_CURRENT_DESKTOP")) {
         return "unknown";
     }
-    
+
     if (getenv("XDG_CURRENT_DESKTOP")) {
         return getenv("XDG_CURRENT_DESKTOP");
     }
-    
+
     return getenv("XDG_SESSION_DESKTOP");
 }
 

@@ -3,7 +3,7 @@ lowfetch
 A system info tool I made to learn C
 
 GOALS:
-* Few lines of code (<500) while having readable code
+* Few lines of code (<1000) while having readable code
 * Few/no runtime dependencies
 
 IN PROGRESS:

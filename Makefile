@@ -1,7 +1,7 @@
 CC = clang
 CFLAGS = -std=c99 -fuse-ld=mold -Wall -O3
 DEBUGFLAGS = -std=c99 -fuse-ld=mold -Wall -g -O0
-SRC = src/lowfetch.c src/include/lowfetch_base.c src/include/package_amount.c src/include/kernel_version.c  src/include/uptime.c src/include/argument_parsing.c
+SRC = src/main.c src/include/argument_parsing/argument_parsing.c src/include/definitions/colors.c src/include/distro/distro.c src/include/general/file_read.c src/include/kernel/kernel.c src/include/package_amount/package_amount.c src/include/shell/shell.c src/include/uptime/uptime.c
 
 all: build run
 

@@ -1,5 +1,5 @@
-#ifndef KERNEL_VERSION_H_
-#define KERNEL_VERSION_H_
+#ifndef KERNEL_H_
+#define KERNEL_H_
 #include <stdlib.h>
 #include <stdbool.h>
 

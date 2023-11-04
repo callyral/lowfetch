@@ -1,7 +1,7 @@
 #ifndef ARGUMENT_PARSING_H_
 #define ARGUMENT_PARSING_H_
 #include <stdbool.h>
-#include "sizes.h"
+#include "../definitions/sizes.h"
 
 struct Options
 {
