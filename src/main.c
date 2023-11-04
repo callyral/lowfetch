@@ -48,12 +48,12 @@ int main(int argc, char **argv)
 
     /* CLI argument parsing */
     /* format: { short, long, desc }*/
-    const char *argdef_help[] =           {"-h",  "--help",           "show this help menu"};
-    const char *argdef_ascii_file[] =     {"-a",  "--ascii",          "select ascii file"};
-    const char *argdef_order_file[] =     {"-o",  "--order",          "select order file"};
-    const char *argdef_color[] =          {"-c",  "--color",          "select color"};
-    const char *argdef_bold[] =           {"-b",  "--bold",           "toggle bold colors"};
-    const char *argdef_kernel_shorten[] = {"-ks", "--kernel-shorten", "shorten kernel version"};
+    const char *argdef_help[] =           {"-h", "--help",           "show this help menu"};
+    const char *argdef_ascii_file[] =     {"-a", "--ascii",          "select ascii file"};
+    const char *argdef_order_file[] =     {"-o", "--order",          "select order file"};
+    const char *argdef_color[] =          {"-c", "--color",          "select color"};
+    const char *argdef_bold[] =           {"-b", "--bold",           "toggle bold colors"};
+    const char *argdef_kernel_shorten[] = {"-k", "--kernel-shorten", "shorten kernel version"};
     // arguments to include in help menu
     // note: new arguments must be appended to end of argdefs_list
     #define ARGDEFS_LIST_SIZE 6
