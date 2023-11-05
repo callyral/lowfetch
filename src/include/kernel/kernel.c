@@ -2,9 +2,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
+#include "../definitions/sizes.h"
 #include "kernel.h"
 
-char *get_kernel_version(bool shorten, size_t size)
+char *get_kernel_version(bool shorten)
 {
     FILE *file = fopen("/proc/version", "r");
     if (!file)
@@ -13,9 +14,9 @@ char *get_kernel_version(bool shorten, size_t size)
         return NULL;
     }
 
-    char *kernel_version = malloc((size+1)*sizeof(*kernel_version));
+    char *kernel_version = malloc((KERNEL_SIZE+1)*sizeof(*kernel_version));
 
-    fgets(kernel_version, size, file);
+    fgets(kernel_version, KERNEL_SIZE, file);
     fclose(file);
 
     kernel_version[strlen(kernel_version) - 1] = 0; // trim the traling newline
@@ -25,7 +26,7 @@ char *get_kernel_version(bool shorten, size_t size)
         return kernel_version;
     }
 
-    char *kernel_version_short = malloc((size+1)*sizeof(*kernel_version_short));
+    char *kernel_version_short = malloc((KERNEL_SIZE+1)*sizeof(*kernel_version_short));
     char *kernel_version_token = strtok(kernel_version, " ");
 
     // loop until the third word

@@ -1,6 +1,7 @@
 #include <stdlib.h>
+#include "xdg_desktop.h"
 
-char *get_desktop_session() {
+char *get_xdg_desktop() {
     // this prefers $XDG_CURRENT_DESKTOP over $XDG_SESSION_DESKTOP
     if (!getenv("XDG_SESSION_DESKTOP") && !getenv("XDG_CURRENT_DESKTOP")) {
         return "unknown";

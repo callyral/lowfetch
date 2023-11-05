@@ -2,12 +2,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "../definitions/sizes.h"
+#include "package_amount.h"
 
-char *get_package_amount(size_t size)
+char *get_package_amount()
 {
     FILE *package_file;
     char *package_amount;
-    package_amount = malloc((size+1)*sizeof(*package_amount));
+    package_amount = malloc((PACKAGE_AMOUNT_SIZE+1)*sizeof(*package_amount));
 
     if (system("which dpkg > /dev/null 2>&1") == 0)
     {
@@ -30,7 +32,7 @@ char *get_package_amount(size_t size)
         fprintf(stderr, "error: unknown package manager\n");
         return NULL;
     }
-    fgets(package_amount, size, package_file);
+    fgets(package_amount, PACKAGE_AMOUNT_SIZE, package_file);
     package_amount[strlen(package_amount) - 1] = 0;
     return package_amount;
 }

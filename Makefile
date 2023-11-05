@@ -1,7 +1,7 @@
 CC = clang
 CFLAGS = -std=c99 -fuse-ld=mold -Wall -O3
 DEBUGFLAGS = -std=c99 -fuse-ld=mold -Wall -g -O0
-SRC = src/main.c src/include/argument_parsing/argument_parsing.c src/include/definitions/colors.c src/include/distro/distro.c src/include/general/file_read.c src/include/kernel/kernel.c src/include/package_amount/package_amount.c src/include/shell/shell.c src/include/uptime/uptime.c src/include/ascii/ascii.c src/include/output/output.c src/include/session/session.c
+SRC = src/main.c src/include/argument_parsing/argument_parsing.c src/include/definitions/colors.c src/include/distro/distro.c src/include/general/file_read.c src/include/kernel/kernel.c src/include/package_amount/package_amount.c src/include/shell/shell.c src/include/uptime/uptime.c src/include/ascii/ascii.c src/include/output/output.c src/include/xdg_desktop/xdg_desktop.c
 
 all: build run
 

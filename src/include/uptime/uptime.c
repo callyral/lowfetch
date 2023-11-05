@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include "../definitions/sizes.h"
 #include "uptime.h"
 
 char *format_seconds(unsigned int seconds, size_t size)
@@ -26,7 +27,7 @@ char *format_seconds(unsigned int seconds, size_t size)
     return formatted_output;
 }
 
-char *get_uptime(size_t size)
+char *get_uptime()
 {
     FILE *file = fopen("/proc/uptime", "r");
     if (!file)
@@ -37,12 +38,12 @@ char *get_uptime(size_t size)
 
     char *uptime;
     unsigned int uptime_seconds = -1; // default value is integer limit, making errors obvious
-    uptime = malloc((size+1)*sizeof(*uptime));
+    uptime = malloc((UPTIME_SIZE+1)*sizeof(*uptime));
 
     fscanf(file, "%u", &uptime_seconds); // store value of file to an unsigned integer, flooring it
     fclose(file);
 
-    uptime = format_seconds(uptime_seconds, size);
+    uptime = format_seconds(uptime_seconds, UPTIME_SIZE);
 
     return uptime;
 }

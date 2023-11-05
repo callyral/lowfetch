@@ -37,19 +37,15 @@ static ArgumentList argument_list = {
         .order_file =     {'o', "--order",          "select order file"}
 };
 
-bool is_argument(char *string)
+bool is_argument_key(char *string)
 {
-    if (!string)
-    {
-        return false;
-    }
     return string[0] == '-';
 }
 
 bool is_short_argument(char *string)
 {
     // checks if string starts with only one dash
-    return is_argument(string) && !(string[1] == '-');
+    return string[0] == '-' && !(string[1] == '-');
 }
 
 bool compare_to_argument_def(char *input_key, ArgumentDef def)
@@ -89,6 +85,8 @@ Options argument_parsing(int argc, char **argv)
             .kernel_shorten = false,
             .use_order_file = false,
             .color_char = CHAR_WHITE,
+            .ascii_file = "",
+            .order_file = ""
     };
 
     if (getenv("XDG_CONFIG_HOME"))
@@ -110,6 +108,7 @@ Options argument_parsing(int argc, char **argv)
 
     if (argc <= 1) { return options; }
 
+    // TODO: explain this
     for (int i = 1; i < argc; ++i)
     {
         options.help_mode =      compare_to_argument_def(argv[i], argument_list.help) || options.help_mode;
@@ -119,22 +118,26 @@ Options argument_parsing(int argc, char **argv)
         if (compare_to_argument_def(argv[i], argument_list.ascii_file))
         {
             options.use_ascii_file = true;
-            if (!is_argument(argv[i+1]))
+            if (argv[i+1] && !is_argument_key(argv[i+1]))
             {
                 strcpy(options.ascii_file, argv[i+1]);
             }
+            if (!is_short_argument(argv[i])) { continue; }
         }
         if (compare_to_argument_def(argv[i], argument_list.order_file))
         {
             options.use_order_file = true;
-            if (!is_argument(argv[i+1]))
+            if (argv[i+1] && !is_argument_key(argv[i+1]))
             {
                 strcpy(options.order_file, argv[i+1]);
             }
+            if (!is_short_argument(argv[i])) { continue; }
         }
-        if (compare_to_argument_def(argv[i], argument_list.color) && !is_argument(argv[i+1]) )
+
+        if (compare_to_argument_def(argv[i], argument_list.color) && !is_argument_key(argv[i+1]))
         {
             options.color_char = argv[i+1][0];
+            if (!is_short_argument(argv[i])) { continue; }
         }
     }
 

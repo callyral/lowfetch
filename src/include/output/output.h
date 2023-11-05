@@ -1,7 +1,6 @@
 #ifndef OUTPUT_H_
 #define OUTPUT_H_
 #include <stdbool.h>
-#include <stdlib.h>
  
 #define CHAR_ASCII          'a'
 #define CHAR_DISTRO_ID      'd'
@@ -11,8 +10,7 @@
 #define CHAR_UPTIME         'u'
 #define CHAR_XDG_DESKTOP    'x'
 
-struct SystemInfo
-{
+typedef struct {
     char *ascii;
     char *distro_id;
     char *kernel_version;
@@ -20,8 +18,8 @@ struct SystemInfo
     char *shell;
     char *uptime;
     char *xdg_desktop;
-};
+}SystemInfo;
 
-void info_print(char accent_color_char, bool accent_bold, bool use_order_file, char *order_filename, size_t order_filesize, struct SystemInfo system_info);
+void info_print(char color_char, bool bold, bool use_order_file, char *order_filename, SystemInfo system_info);
 
 #endif

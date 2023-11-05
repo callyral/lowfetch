@@ -3,6 +3,6 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
-char *get_kernel_version(bool shorten, size_t size);
+char *get_kernel_version(bool shorten);
 
 #endif

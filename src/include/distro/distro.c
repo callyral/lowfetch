@@ -1,21 +1,22 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include "../definitions/sizes.h"
 #include "distro.h"
 
-char *get_distro_id(size_t size)
+char *get_distro_id()
 {
     FILE *file = fopen("/etc/os-release", "r");
     if (!file)
     {
-        fprintf(stderr, "error: '/etc/os-release' is unreadable or doesn't exist\n");
+        fprintf(stderr, "error: '/etc/os-release' (distro information) is unreadable or doesn't exist\n");
         return NULL;
     }
 
     char *distro_id;
-    distro_id = malloc((size+1)*sizeof(*distro_id));
+    distro_id = malloc((DISTRO_ID_SIZE+1)*sizeof(*distro_id));
 
-    fgets(distro_id, size, file); // get the first line (NAME="Distro")
+    fgets(distro_id, DISTRO_ID_SIZE, file); // get the first line (NAME="Distro")
     fclose(file);
 
     distro_id[strlen(distro_id) - 1] = 0; // trim the trailing newline
