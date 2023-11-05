@@ -3,12 +3,11 @@ lowfetch
 A system info tool I made to learn C
 
 GOALS:
-* Few lines of code (<500) while having readable code
-* Few/no runtime dependencies
+* Small but featureful
+* Few/no dependencies (other than C standard library)
 
 IN PROGRESS:
-* Refactor (see refactor branch)
-* Modularize code
+* (null)
 
 TODO:
 * (null)
@@ -35,10 +34,17 @@ ASSUMPTIONS:
 * You have a package manager (dpkg, dnf, xpbs or pacman) - support for more may be added
 
 DOCUMENTATION:
+usage: lowfetch [options]
+    -h, --help,           show this help menu
+    -a, --ascii,          select ascii file
+    -b, --bold,           enable boldness
+    -c, --color,          select color
+    -k, --kernel-shorten, enable shorter kernel version
+    -o, --order,          select order file
 ascii file (xdg-config/lowfetch/ascii):
-    format: text
+    format: plaintext
 order file (xdg-config/lowfetch/order):
-    format: [a]scii [d]istro [k]ernel [p]ackage amount [s]hell [u]ptime [x]dg
+    format: [a]scii [d]istro [k]ernel [p]ackage-amount [s]hell [u]ptime [x]dg-desktop
     example: adukspax
 color options:
     [w]hite
@@ -49,14 +55,14 @@ color options:
     [m]agenta
     [c]yan
 
-EXAMPLE OUTPUT (with --kernel-shorten):
-   |\'/-..--.
-   / _ _   ,  ;
-  `~=`Y'~_<._./
-   <`-....__.'
-  distro: Void
-  xdg:    sway
-  pkgs:   896
-  shell:  /bin/zsh
-  uptime: 3192 minutes and 47 seconds
-  kernel: Linux version 6.5.8_1 
+EXAMPLE OUTPUT (with -k):
+     |\'/-..--.
+     / _ _   ,  ;
+    `~=`Y'~_<._./
+     <`-....__.'
+    distro: Void
+    xdg:    sway
+    pkgs:   896
+    shell:  /bin/zsh
+    uptime: 3192 minutes and 47 seconds
+    kernel: Linux version 6.5.8_1 
