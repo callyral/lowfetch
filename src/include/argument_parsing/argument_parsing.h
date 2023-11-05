@@ -3,17 +3,19 @@
 #include <stdbool.h>
 #include "../definitions/sizes.h"
 
-struct Options
+typedef struct
 {
+    bool help_mode;
     bool use_ascii_file;
+    bool bold;
+    bool kernel_shorten;
     bool use_order_file;
-    bool accent_bold;
-    bool shorten_kernel_version;
-    char ascii_filename[FILENAME_SIZE];
-    char order_filename[FILENAME_SIZE];
-    char accent_color_char;
-};
 
-struct Options argument_parsing(int argc, char **argv, const char **argdefs_list[], unsigned int argdefs_list_size);
+    char color_char;
+    char ascii_file[FILENAME_SIZE];
+    char order_file[FILENAME_SIZE];
+}Options;
+
+Options argument_parsing(int argc, char **argv);
 
 #endif
