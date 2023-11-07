@@ -5,25 +5,46 @@
 
 char *format_seconds(unsigned int seconds, size_t size)
 {
+    unsigned int seconds_part = seconds%60;
+    unsigned int minutes_part = seconds/60;
     char *formatted_output = malloc((size+1)*sizeof(*formatted_output));
-    if (seconds >= 60)
+    if (minutes_part < 1)
     {
-        switch (seconds%60) // switch seconds part
+        // 1 second is not handled since it's very unlikely.
+        sprintf(formatted_output, "%u seconds", seconds);
+        return formatted_output;
+    }
+
+    // 1 minute (singular)
+    if (minutes_part == 1)
+    {
+        switch (seconds_part)
         {
             case 0:
-                sprintf(formatted_output, "%u minutes", seconds/60);
+                sprintf(formatted_output, "%u minute", minutes_part);
                 break;
             case 1:
-                sprintf(formatted_output, "%u minutes and 1 second", seconds/60);
+                sprintf(formatted_output, "%u minute and 1 second", minutes_part);
                 break;
             default:
-                sprintf(formatted_output, "%u minutes and %u seconds", seconds/60, seconds%60);
+                sprintf(formatted_output, "%u minute and %u seconds", minutes_part, seconds_part);
         }
+        return formatted_output;
     }
-    else
+
+    // More than 1 minute or 0 minutes (plural)
+    switch (seconds_part)
     {
-        sprintf(formatted_output, "%u seconds", seconds);
+        case 0:
+            sprintf(formatted_output, "%u minutes", minutes_part);
+            break;
+        case 1:
+            sprintf(formatted_output, "%u minutes and 1 second", minutes_part);
+            break;
+        default:
+            sprintf(formatted_output, "%u minutes and %u seconds", minutes_part, seconds_part);
     }
+
     return formatted_output;
 }
 
