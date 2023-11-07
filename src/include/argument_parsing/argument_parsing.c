@@ -111,6 +111,7 @@ Options argument_parsing(int argc, char **argv)
     // TODO: explain this
     for (int i = 1; i < argc; ++i)
     {
+        if (strcmp(argv[i], "--") == 0) { break; } // stop parsing arguments after "--"
         options.help_mode =      compare_to_argument_def(argv[i], argument_list.help) || options.help_mode;
         options.bold =           compare_to_argument_def(argv[i], argument_list.bold) || options.bold;
         options.kernel_shorten = compare_to_argument_def(argv[i], argument_list.kernel_shorten) || options.kernel_shorten;
