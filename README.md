@@ -1,3 +1,5 @@
+Archived: migrated to [Codeberg](https://codeberg.org/callyral/lowfetch)
+
 # lowfetch
 
 ![image](img/banner.png)
